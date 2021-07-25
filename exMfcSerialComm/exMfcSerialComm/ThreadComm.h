@@ -15,6 +15,7 @@ public:
 	BYTE buff[BUFF_SIZE]; // CQueue Buffer
 	int m_iHead, m_iTail;  // CQueue Head Tail Position
 	CQueue() :m_iHead(0), m_iTail(0) { Clear(); }
+	virtual ~CQueue() {};
 	void Clear() // Queue의 내용을 지운다.
 	{
 		m_iHead = m_iTail = 0;
@@ -49,6 +50,7 @@ class CThreadComm
 {
 
 public:
+	HWND  m_mainhwnd;
 	HANDLE m_hComm; // 통신 포트 파일 핸들
 	CString m_PortName; // 포트 이름
 	BOOL m_bConnected;  // 포트가 열렸는지 확인
@@ -62,6 +64,14 @@ public:
 
 	CQueue m_QueueRead; // 스레드와 부모 프로세스간의 통신 버퍼
 	// Serial Port를 연다. 인자로 포트명의 String과 속도, 포트 번호를 준다.
+	
+	
+	CThreadComm();
+	virtual ~CThreadComm();
+
+	void clear();
+	void AssignHwd(HWND hwnd);
+
 	BOOL OpenPort(CString sPortName, DWORD dwBaud, WORD wParam, HWND hwnd);
 	// Serial Port를 닫는다
 	void ClosePort();

@@ -18,13 +18,19 @@
     <ClInclude Include="exMfcSerialComm.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="exMfcSerialCommDlg.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="exMfcSerialCommDoc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="exMfcSerialCommView.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
@@ -33,13 +39,25 @@
     <ClInclude Include="pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Serial.h">
+    <ClInclude Include="serialcomm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="serialport.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WinSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CommSerial.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RS232Comm.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ThreadComm.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="port.h">
+    <ClInclude Include="TestMain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,19 +65,37 @@
     <ClCompile Include="exMfcSerialComm.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="exMfcSerialCommDlg.cpp">
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="exMfcSerialCommDoc.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="exMfcSerialCommView.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Serial.cpp">
+    <ClCompile Include="serialcomm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="serialport.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WinSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CommSerial.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RS232Comm.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ThreadComm.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="port.cpp">
+    <ClCompile Include="TestMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,13 +105,25 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\exMfcSerialComm.rc2">
+    <Image Include="res\userimages.bmp">
       <Filter>리소스 파일</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    </Image>
+    <Image Include="res\exMfcSerialCommDoc.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
     <Image Include="res\exMfcSerialComm.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Toolbar256.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\exMfcSerialComm.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

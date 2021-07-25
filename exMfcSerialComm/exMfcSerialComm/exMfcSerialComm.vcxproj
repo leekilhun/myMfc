@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{109E1F96-611E-46AA-9E5A-7A4073F83BEB}</ProjectGuid>
+    <ProjectGuid>{570FD0E4-7ABB-4B20-8959-F7FC3E2E91E0}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>exMfcSerialComm</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -183,37 +183,53 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommSerial.h" />
     <ClInclude Include="exMfcSerialComm.h" />
-    <ClInclude Include="exMfcSerialCommDlg.h" />
+    <ClInclude Include="exMfcSerialCommDoc.h" />
+    <ClInclude Include="exMfcSerialCommView.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="port.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Serial.h" />
+    <ClInclude Include="RS232Comm.h" />
+    <ClInclude Include="serialcomm.h" />
+    <ClInclude Include="serialport.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TestMain.h" />
     <ClInclude Include="ThreadComm.h" />
+    <ClInclude Include="WinSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommSerial.cpp" />
     <ClCompile Include="exMfcSerialComm.cpp" />
-    <ClCompile Include="exMfcSerialCommDlg.cpp" />
+    <ClCompile Include="exMfcSerialCommDoc.cpp" />
+    <ClCompile Include="exMfcSerialCommView.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="port.cpp" />
-    <ClCompile Include="Serial.cpp" />
+    <ClCompile Include="RS232Comm.cpp" />
+    <ClCompile Include="serialcomm.cpp" />
+    <ClCompile Include="serialport.cpp" />
+    <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="ThreadComm.cpp" />
+    <ClCompile Include="WinSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="exMfcSerialComm.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\exMfcSerialComm.rc2" />
+    <Image Include="res\exMfcSerialComm.ico" />
+    <Image Include="res\exMfcSerialCommDoc.ico" />
+    <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
+    <Image Include="res\userimages.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\exMfcSerialComm.ico" />
+    <None Include="res\exMfcSerialComm.rc2" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,6 +6,36 @@ CWnd* pWnd = AfxGetMainWnd();
 HWND hCommWnd;
 
 
+CThreadComm::CThreadComm()
+{
+	clear();
+}
+
+CThreadComm::~CThreadComm()
+{
+	if (m_hThreadWatchComm != NULL)
+	{
+		delete m_hThreadWatchComm;
+	}
+
+	clear();
+}
+
+void CThreadComm::clear()
+{
+	m_mainhwnd = nullptr;
+	m_hComm = NULL; 
+	m_PortName = _T(""); 
+	m_bConnected = FALSE; 
+	m_hThreadWatchComm = NULL;
+	m_wPortID = 0;
+}
+
+void CThreadComm::AssignHwd(HWND hwnd)
+{
+	m_mainhwnd = hwnd;
+}
+
 BOOL CThreadComm::OpenPort(CString sPortName, DWORD dwBaud, WORD wPortID, HWND hwnd)
 {
 	hCommWnd = hwnd;
@@ -40,26 +70,16 @@ BOOL CThreadComm::OpenPort(CString sPortName, DWORD dwBaud, WORD wPortID, HWND h
 
 
 	// 포트 열기
+	m_PortName = L"//./" + sPortName;
+	m_hComm = CreateFile(m_PortName, 
+		GENERIC_READ | GENERIC_WRITE, 
+		0, 
+		NULL, 
+		OPEN_EXISTING, 
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 
+		NULL);
 
-	m_PortName = L"//./"+ sPortName;
-	
-	m_hComm = CreateFile(m_PortName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
 	if (m_hComm == (HANDLE)-1) return FALSE; // 포트 열기 실패
-	
-	/*
-	m_hComm = CreateFile( m_PortName,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		0,
-		OPEN_EXISTING,
-		0,
-		0);
-
-	if (m_hComm == INVALID_HANDLE_VALUE)
-		return false;
-	*/
-
-	
 
 	// EV_RXCHAR event 설정
 
@@ -96,7 +116,6 @@ BOOL CThreadComm::OpenPort(CString sPortName, DWORD dwBaud, WORD wPortID, HWND h
 	//if (!SetCommState(m_hComm, &dcb)) return FALSE;
 
 	// 포트 감시 스레드 생성
-
 	m_bConnected = TRUE; // 연결이 성립되었음을 세팅
 	m_hThreadWatchComm = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadWatchComm, this, 0, &dwThreadID);
 	EscapeCommFunction(m_hComm, SETDTR);
@@ -258,7 +277,7 @@ DWORD ThreadWatchComm(CThreadComm* pComm)
 
 			} while (dwRead);
 
-			//CEdit* p = (CEdit*)GetDlgItem(hCommWnd,IDC_EDIT2);
+			CEdit* p = (CEdit*)GetDlgItem(pComm->m_mainhwnd,101);
 
 			//p->SetWindowTextW((LPCTSTR)buff);
 
