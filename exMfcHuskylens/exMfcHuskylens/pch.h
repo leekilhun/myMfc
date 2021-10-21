@@ -10,6 +10,9 @@
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 
+#include "tString.h"
+#include "qBuffer.h"
+
 
 #define WM_COMM_RS232_READ		(WM_USER+1)		// THREAD가 부모 프로세스에 보낼 메시지
 

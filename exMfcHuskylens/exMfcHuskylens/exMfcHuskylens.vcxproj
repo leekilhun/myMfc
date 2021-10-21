@@ -188,8 +188,10 @@
     <ClInclude Include="exMfcHuskylensDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="qBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="tString.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommRs232.cpp" />

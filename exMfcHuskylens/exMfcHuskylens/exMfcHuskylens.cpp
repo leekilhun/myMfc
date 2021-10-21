@@ -44,18 +44,33 @@ BOOL CexMfcHuskylensApp::InitInstance()
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
 		return FALSE;
 	}
-
-
-	//const TCHAR s[5] = {'1', '2', '3', '4', '\0'};
-	//TCHAR d[100] = {'\0',}; // 문자열로서의 d 는 비어있는 상태임. "" 과 비슷한 상태..
-	//_tcscat_s(d, 3*2, s); // 문자열 d 에 문자열 s 를 추가함.
-
-
 	
+
+
+	/*int len = sizeof(send_msg);
+	memset(send_msg, 0x00, 1024 * sizeof(CHAR));*/
+
+
+	/*
+	TQueue q;
+	q.Write("12345", 6);
+	CHAR read[100] = {0,};
+	
+	*/
+
+	//CHAR send_msg[1024];
+	//memset(send_msg, 0x00, sizeof(send_msg));
+	//char* dn;
+	//dn = "\r";
+
+	//size_t len = strlen(send_msg)+2;
+	//strncat_s(send_msg, len, dn, 1);
+	
+
+
 	CexMfcHuskylensDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
-	
 
 
 	return FALSE;

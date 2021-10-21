@@ -36,6 +36,12 @@
     <ClInclude Include="CommRs232.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="tString.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="qBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exMfcHuskylens.cpp">

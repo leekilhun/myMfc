@@ -10,6 +10,9 @@
 
 #define WM_COMM_RS232_MESSAGE	(WM_USER+2)		//
 
+#if 0
+
+
 class CCommRingQueue
 {
 public:
@@ -17,16 +20,16 @@ public:
 	int m_Head, m_Tail;  // CQueue Head Tail Position
 	int m_Length;
 public:
-	CCommRingQueue(){
+	CCommRingQueue() {
 		Init();
 	}
-	virtual ~CCommRingQueue(){
+	virtual ~CCommRingQueue() {
 		Init();
 	}
 
 	inline void Init()
 	{
-		m_Head = m_Tail = m_Length= COMM_RS232_BUFF_SIZE;
+		m_Head = m_Tail = m_Length = COMM_RS232_BUFF_SIZE;
 		memset(buff, 0x00, COMM_RS232_BUFF_SIZE);
 	}
 
@@ -34,13 +37,16 @@ public:
 		BOOL ret = true;
 		uint32_t next_in;
 
-		for (int i = 0; i < (int)length; i++)	{
+		for (int i = 0; i < (int)length; i++)
+		{
 			next_in = (m_Head + 1) % m_Length;
-			if (next_in != m_Tail)	{
-				buff[m_Tail] = data[i];				
+			if (next_in != m_Tail)
+			{
+				buff[m_Tail] = data[i];
 				m_Head = next_in;
 			}
-			else {
+			else
+			{
 				ret = FALSE;
 				break;
 			}
@@ -51,12 +57,15 @@ public:
 
 	inline BOOL Read(LPSTR data, uint32_t length) {
 		BOOL ret = TRUE;
-		for (int i = 0; i < (int)length; i++)	{
+		for (int i = 0; i < (int)length; i++)
+		{
 			data[i] = buff[m_Tail];
-			if (m_Tail != m_Head){
+			if (m_Tail != m_Head)
+			{
 				m_Tail = (m_Tail + 1) % m_Length;
 			}
-			else{
+			else
+			{
 				ret = false;
 				break;
 			}
@@ -74,6 +83,11 @@ public:
 	}
 
 };
+
+
+#endif // 0
+
+
 
 
 class CCommRs232Queue
@@ -94,26 +108,37 @@ public:
 
 	// Queue에 들어 있는 데이터의 길이를 리턴한다.
 	inline int GetSize() const 	{
-		return (m_Head - m_Tail + COMM_RS232_BUFF_SIZE) % COMM_RS232_BUFF_SIZE;
+		return (COMM_RS232_BUFF_SIZE+ (m_Head - m_Tail) ) % COMM_RS232_BUFF_SIZE;
 	}
 
 	// Queue에 1byte 넣기
 	inline BOOL PutByte(byte b) {
-		// Queue가 꽉 찾는지 검사
-		if (GetSize() == (COMM_RS232_BUFF_SIZE - 1)) return FALSE; 
-		// Queue에 한 바이트를 넣고 Head Pointer를 증가
-		buff[m_Head++] = b;
-		m_Head %= COMM_RS232_BUFF_SIZE;
-		return TRUE;
+		BOOL ret = TRUE;
+		uint32_t next_in;
+		next_in = (m_Head + 1) % COMM_RS232_BUFF_SIZE;
+		if (next_in != m_Tail)
+		{
+			buff[m_Head] = b;
+			m_Head = next_in;
+		}
+		else
+			ret = FALSE;
+
+		return ret;
 	}
 
 	// Queue에 1byte 꺼내기
 	inline BOOL GetByte(byte* pb) {
-		// Queue가 비었는지 검사
-		if (GetSize() == 0) return FALSE; 
-		*pb = buff[m_Tail++];
-		m_Tail %= COMM_RS232_BUFF_SIZE;
-		return TRUE;
+		BOOL ret = TRUE;
+		if (m_Tail != m_Head)
+		{
+			*pb = buff[m_Tail];
+			m_Tail = (m_Tail + 1) % COMM_RS232_BUFF_SIZE;
+		}
+		else
+			ret = FALSE;
+
+		return ret;
 	}
 
 };
@@ -232,7 +257,7 @@ public:
 
 	// Serial Port에 buff내용을 write수 만큼 쓴다
 	// 실제로 쓴 바이트 수를 리턴한다
-	DWORD WriteComm(LPCTSTR buff, int write_len);
+	DWORD WriteComm(LPCSTR buff, int write_len);
 	
 	// 포트로부터 buff에 read만큼 읽는다.
 	// 실제로 읽혀진 Byte수를 리턴한다.

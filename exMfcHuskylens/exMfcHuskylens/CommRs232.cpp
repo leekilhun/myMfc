@@ -136,7 +136,7 @@ BOOL CCommRs232::OpenPort(CString port_name, DWORD baud, WORD port_no, HWND hwnd
 	m_hCommWnd = hwnd;
 	m_Baudrate = baud;
 
-#if COMM_USE_MY_QUEUE
+
 	DWORD dwThreadID; // Thread ID를 얻음
 	m_IsConnected = FALSE;
 	m_wPortID = port_no; // COM1 -> 0 , COM2->1,,,,
@@ -194,145 +194,6 @@ BOOL CCommRs232::OpenPort(CString port_name, DWORD baud, WORD port_no, HWND hwnd
 	}
 
 
-#if 0
-
-	// 변수 설정
-
-	// overlapped structure 변수 초기화
-	m_osRead.Offset = 0;
-	m_osRead.OffsetHigh = 0;
-
-	if (!(m_osRead.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
-	{
-		if (m_osRead.hEvent != 0) CloseHandle(m_osRead.hEvent);
-		return FALSE;
-	}
-
-	m_osWrite.Offset = 0;
-	m_osWrite.OffsetHigh = 0;
-	if (!(m_osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
-	{
-		if (m_osWrite.hEvent != 0) CloseHandle(m_osWrite.hEvent);
-		return FALSE;
-	}
-
-	// 포트 열기
-	m_PortName = L"//./" + port_name;
-	m_hComm = CreateFile(m_PortName,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
-		NULL);
-
-	if (m_hComm == (HANDLE)-1) return FALSE; // 포트 열기 실패
-
-	// EV_RXCHAR event 설정
-	SetCommMask(m_hComm, EV_RXCHAR);
-
-	// Serail Port 장치의 InQueue, OutQueue 크기 설정
-	SetupComm(m_hComm, COMM_BUFF_MAX, COMM_BUFF_MAX);
-
-	// 포트 InQueue , OutQueue 초기화
-	PurgeComm(m_hComm, PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR);
-
-	// Timeout Value를 설정하기 위한 구조체
-	COMMTIMEOUTS timeouts = {};
-	timeouts.ReadIntervalTimeout = 0xFFFFFFFF;
-	timeouts.ReadTotalTimeoutMultiplier = 0;
-	timeouts.ReadTotalTimeoutConstant = 0;
-	timeouts.WriteTotalTimeoutConstant = 0;
-	timeouts.WriteTotalTimeoutMultiplier = 2 * CBR_9600 / baud;
-	if (SetCommTimeouts(m_hComm, &timeouts))
-	{
-		ClosePort();
-		return FALSE;
-	}
-
-	// dcb설정 Serial Port의 특성을 설정하기 위한 구조체
-	DCB dcb = {};
-	dcb.DCBlength = sizeof(DCB);
-	GetCommState(m_hComm, &dcb);
-	dcb.BaudRate = baud;
-	dcb.ByteSize = 8;
-	dcb.Parity = 0;
-	dcb.StopBits = 1;
-	dcb.fInX = dcb.fOutX = 1; // Xon , Xoff 사용 // Xon , Xoff 사용하지 않을 경우는 CriticalSection을 설정 하여 보호해 주어야 한다.
-
-	dcb.XonChar = COMM_RS232_ASCII_XON;
-	dcb.XonChar = COMM_RS232_ASCII_XOFF;
-	dcb.XonLim = 100;
-	dcb.XoffLim = 100;
-
-	if (!SetCommState(m_hComm, &dcb))
-	{
-		ClosePort();
-		return FALSE;
-	}
-
-	// 포트 감시 스레드 생성
-	m_IsConnected = TRUE; // 연결이 성립되었음을 세팅
-	m_hThreadWatchComm = CreateThread(
-		NULL,
-		0,
-		(LPTHREAD_START_ROUTINE)ThreadWatchComm,
-		this,
-		0,
-		&dwThreadID
-	);
-	EscapeCommFunction(m_hComm, SETDTR);
-
-	if (!m_hThreadWatchComm)
-	{
-		// 실패하면 포트를 닫는다.
-		ClosePort();
-		return FALSE;
-	}
-
-#endif
-
-#else
-	// 포트 열기
-	m_PortName = L"//./" + port_name;
-	m_hComm = CreateFile(m_PortName,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
-		NULL);
-
-	if (m_hComm != INVALID_HANDLE_VALUE)
-		m_IsConnected = TRUE;
-	else
-		return FALSE; // 포트 열기 실패
-
-	ResetPort();
-
-	// overlapped structure 변수 초기화
-	m_osRead.Offset = 0;
-	m_osRead.OffsetHigh = 0;
-	if (!(m_osRead.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
-	{
-		if (m_osRead.hEvent != 0) CloseHandle(m_osRead.hEvent);
-		return FALSE;
-	}
-
-	m_osWrite.Offset = 0;
-	m_osWrite.OffsetHigh = 0;
-	if (!(m_osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
-	{
-		if (m_osWrite.hEvent != 0) CloseHandle(m_osWrite.hEvent);
-		return FALSE;
-	}
-
-	AfxBeginThread(CommThread, (LPVOID)this);
-	EscapeCommFunction(m_hComm, SETDTR);
-
-
-#endif
-	// ####
 
 	return TRUE;
 }
@@ -354,7 +215,7 @@ void CCommRs232::ClosePort()
 
 
 
-DWORD CCommRs232::WriteComm(LPCTSTR buff, int write_len)
+DWORD CCommRs232::WriteComm(LPCSTR buff, int write_len)
 {
 
 	DWORD dwWritten, dwError, dwErrorFlags;
@@ -490,18 +351,17 @@ DWORD ThreadWatchComm(CCommRs232* pComm)
 
 			} while (dwRead);
 
-			//CEdit* p = (CEdit*)GetDlgItem(hCommWnd, 1004);
 
 			//p->SetWindowTextW(L"test_Ok"/*(LPCTSTR)buff*/);
 
-			TRACE(traceAppMsg, 0, "데이터를 받았습니다.\r\n");
+			//TRACE(traceAppMsg, 0, "데이터를 받았습니다.\r\n");
 			// 읽어가도록 메시지를 보낸다.
 			::PostMessage(pComm->m_hCommWnd, WM_COMM_RS232_MESSAGE, pComm->m_wPortID, 0);
 			//TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 응용 프로그램이 예기치 않게 종료됩니다.\n");
 		}
 	}
-	// 포트가 ClosePort에 의해 닫히면 m_bConnected가 FALSE가 되어 종료
 
+	// 포트가 ClosePort에 의해 닫히면 m_bConnected가 FALSE가 되어 종료
 	CloseHandle(os.hEvent);
 	pComm->m_hThreadWatchComm = NULL;
 
