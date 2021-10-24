@@ -20,6 +20,8 @@
 CtextDlgMsgDlg::CtextDlgMsgDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TEXTDLGMSG_DIALOG, pParent)
 {
+	m_popMsg = nullptr;
+	m_thread = nullptr;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -34,6 +36,9 @@ BEGIN_MESSAGE_MAP(CtextDlgMsgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_START, &CtextDlgMsgDlg::OnBnClickedBtnStart)
 	ON_BN_CLICKED(IDC_BTN_POP, &CtextDlgMsgDlg::OnBnClickedBtnPop)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_PAUSE, &CtextDlgMsgDlg::OnBnClickedBtnPause)
+	ON_BN_CLICKED(IDC_BTN_RESUME, &CtextDlgMsgDlg::OnBnClickedBtnResume)
+	ON_BN_CLICKED(IDC_BTN_END, &CtextDlgMsgDlg::OnBnClickedBtnEnd)
 END_MESSAGE_MAP()
 
 
@@ -49,6 +54,11 @@ BOOL CtextDlgMsgDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+
+	CtextDlgMsgApp*main = (CtextDlgMsgApp*)AfxGetApp();
+	m_thread = main->GetSystem();
+	//m_thread = theApp.GetSystem();
+	m_thread->RunThread();
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -94,6 +104,10 @@ HCURSOR CtextDlgMsgDlg::OnQueryDragIcon()
 void CtextDlgMsgDlg::OnBnClickedBtnStart()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	if (m_thread->IsRun() == FALSE)
+	{
+		m_thread->StartThread(NULL);
+	}
 }
 
 
@@ -125,4 +139,35 @@ void CtextDlgMsgDlg::OnDestroy()
 	CDialogEx::OnDestroy();
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	if (m_popMsg != nullptr)
+	{
+		delete m_popMsg;
+		m_popMsg = nullptr;
+	}
+
+	if (m_thread != nullptr)
+	{
+		m_thread = nullptr;
+	}
+}
+
+
+void CtextDlgMsgDlg::OnBnClickedBtnPause()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_thread->SuspendThread();
+}
+
+
+void CtextDlgMsgDlg::OnBnClickedBtnResume()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_thread->ResumeThread();
+}
+
+
+void CtextDlgMsgDlg::OnBnClickedBtnEnd()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_thread->TerminateThread();
 }

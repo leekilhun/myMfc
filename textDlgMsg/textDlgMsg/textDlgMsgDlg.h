@@ -11,6 +11,7 @@ class CtextDlgMsgDlg : public CDialogEx
 
 public:
 	CpopMsg* m_popMsg;
+	CmsgThread* m_thread;
 
 
 // 생성입니다.
@@ -40,4 +41,7 @@ public:
 	afx_msg void OnBnClickedBtnPop();
 	virtual BOOL DestroyWindow();
 	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedBtnPause();
+	afx_msg void OnBnClickedBtnResume();
+	afx_msg void OnBnClickedBtnEnd();
 };

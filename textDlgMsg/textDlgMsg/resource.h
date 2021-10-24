@@ -11,6 +11,10 @@
 #define IDC_BTN_START                   1002
 #define IDC_BUTTON2                     1003
 #define IDC_BTN_POP                     1003
+#define IDC_BTN_PAUSE                   1004
+#define IDC_BTN_RESUME                  1005
+#define IDC_BTN_START4                  1006
+#define IDC_BTN_END                     1006
 
 // Next default values for new objects
 // 

@@ -203,8 +203,9 @@ public:
 		m_StateThread = 0;
 		m_Continue = TRUE;
 	}
-	~CmsgThread() { 
+	virtual ~CmsgThread() { 
 		m_Continue = FALSE;
+		TerminateThread();
 	}
 
 	UINT ThreadPriorityNum(LPVOID pParam)
@@ -214,6 +215,8 @@ public:
 
 	void RunThread()
 	{
+		if (m_pThread != nullptr) return;
+
 		m_pThread = ::AfxBeginThread(StartThread, &m_Continue);
 
 	}
@@ -221,12 +224,13 @@ public:
 	{
 		BOOL* pbContinue = (BOOL*)pParam;
 		int count = 0;
-		while (pbContinue)
+		while (*pbContinue)
 		{
 			count++;
 			Sleep(10);
 		}
-		std::cout << "Exit Thread" << std::endl;
+		//std::cout << "Exit Thread" << std::endl;
+		TRACE("\r Exit Thread \n");
 
 		return 0;
 
@@ -262,6 +266,7 @@ public:
 
 	BOOL IsRun()
 	{
+		if (m_pThread == nullptr) return FALSE;
 		if (::WaitForSingleObject(m_pThread->m_hThread, 0) == WAIT_TIMEOUT)
 		{
 			return TRUE;

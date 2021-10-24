@@ -33,6 +33,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 	virtual int ExitInstance();
 
+public:
 	CmsgThread* GetSystem() const {
 		return m_system;
 	}
