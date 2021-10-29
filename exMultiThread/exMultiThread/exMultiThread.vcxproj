@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{10C9E744-A046-4AF6-867E-E8AB91A64CD2}</ProjectGuid>
+    <ProjectGuid>{3162C669-47E8-49EE-B645-04C36F898D6F}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
-    <RootNamespace>textDlgMsg</RootNamespace>
+    <RootNamespace>exMultiThread</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -183,40 +183,33 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CmyDialog.h" />
+    <ClInclude Include="exMultiThread.h" />
+    <ClInclude Include="exMultiThreadDlg.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="msgThread.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="popMsg.h" />
-    <ClInclude Include="qBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="textDlgMsg.h" />
-    <ClInclude Include="textDlgMsgDlg.h" />
     <ClInclude Include="UIThread.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CmyDialog.cpp" />
-    <ClCompile Include="msgThread.cpp" />
+    <ClCompile Include="exMultiThread.cpp" />
+    <ClCompile Include="exMultiThreadDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="popMsg.cpp" />
-    <ClCompile Include="textDlgMsg.cpp" />
-    <ClCompile Include="textDlgMsgDlg.cpp" />
     <ClCompile Include="UIThread.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="textDlgMsg.rc" />
+    <ResourceCompile Include="exMultiThread.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\textDlgMsg.rc2" />
+    <None Include="res\exMultiThread.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textDlgMsg.ico" />
+    <Image Include="res\exMultiThread.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

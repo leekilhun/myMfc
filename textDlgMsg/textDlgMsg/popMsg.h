@@ -31,4 +31,9 @@ public:
 
 public:
 	void setter(CtextDlgMsgDlg* parent);
+protected:
+	afx_msg LRESULT OnPopReceive(WPARAM wParam, LPARAM lParam);
+public:
+	virtual BOOL OnInitDialog();
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 };

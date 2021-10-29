@@ -10,7 +10,4 @@
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 
-typedef void (*CallbackType)(void* obj, const CString& name, void* data);
-#define WM_USER_RECEIVE   WM_USER + 1000
-#define WM_POP_RECEIVE   WM_USER + 1001
 #endif //PCH_H

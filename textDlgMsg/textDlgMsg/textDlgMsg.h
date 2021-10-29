@@ -37,6 +37,10 @@ public:
 	CmsgThread* GetSystem() const {
 		return m_system;
 	}
+
+
+	static void StaticWrapper(void* obj, const CString& name, void* data);
+
 };
 
 extern CtextDlgMsgApp theApp;

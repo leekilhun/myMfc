@@ -1,9 +1,11 @@
 #pragma once
 #include <iostream>
+#include "qBuffer.h"
 
 
 
 #if 0
+참조 https ://202psj.tistory.com/1052
 
 출처 //https://saack.tistory.com/65
 
@@ -63,7 +65,7 @@ if (result == WAIT_OBJECT_0)
 {
 	// 이곳은 스레드를 확실히 종료된 상태임
 }
-esle if (result == WAIT_TIMEOUT)
+else if (result == WAIT_TIMEOUT)
 {
 	// 1초가 지나도 스레도가 종료되지 않음
 }
@@ -99,7 +101,7 @@ BOOL CUIThread::InitInstance()
 {
 	m_pMainWnd = new CMYDialog;
 	m_pMainWnd->ShowWindow(SW_SHOW);
-	m_pMainWnd->UpdataWindow();
+	m_pMainWnd->UpdateWindow();
 	return TRUE;
 }
 와 같이 CMYDialog를 Thread로 띄울 수  있다.그 다음
@@ -192,20 +194,57 @@ class CmsgThread
 	*/
 
 public:
+	HWND m_msgDlg;
 	CWinThread* m_pThread;
-	BOOL				m_Continue;
+	BOOL m_ThreadLife;
+	BOOL m_Continue;
 	DWORD m_StateThread;//  dwContextID;
+	UINT m_Number;
+	CQueue* m_Qbuf;
+
+	CallbackType m_isrFunc;
+	void* m_object;
+	void* m_closure;
+
 
 	// 생성입니다.
 public:
 	CmsgThread() { 
 		m_pThread = nullptr;
+		m_Qbuf = nullptr;
 		m_StateThread = 0;
-		m_Continue = TRUE;
+		m_Number = 0;
+		m_Continue = FALSE;
+		m_ThreadLife = TRUE;
+		m_msgDlg = nullptr;
+		m_isrFunc = nullptr;
+		m_object = nullptr;
+		m_closure = nullptr;
+
+		m_Qbuf = new CQueue;
 	}
 	virtual ~CmsgThread() { 
 		m_Continue = FALSE;
 		TerminateThread();
+		if (m_pThread != nullptr)
+		{
+			//delete m_pThread;
+			m_pThread = nullptr;
+		}
+
+		if (m_Qbuf != nullptr)
+		{
+			delete m_Qbuf;
+			m_Qbuf = nullptr;
+		}
+	}
+
+
+	void SetIRS(void* obj, CallbackType cb, void* data)
+	{
+		m_isrFunc = cb;
+		m_object = obj;
+		m_closure = data;
 	}
 
 	UINT ThreadPriorityNum(LPVOID pParam)
@@ -213,28 +252,51 @@ public:
 		;
 	}
 
-	void RunThread()
+	void ThreadRun()
 	{
 		if (m_pThread != nullptr) return;
 
-		m_pThread = ::AfxBeginThread(StartThread, &m_Continue);
+		m_pThread = ::AfxBeginThread(threadFunc, this);
 
 	}
-	static UINT StartThread(LPVOID pParam)
+	static UINT threadFunc(LPVOID pParam)
 	{
-		BOOL* pbContinue = (BOOL*)pParam;
-		int count = 0;
-		while (*pbContinue)
+		CmsgThread* pThis;
+		pThis = (CmsgThread*)pParam;
+		TRACE("\r Start Thread \n");
+		while (pThis->m_ThreadLife)
 		{
-			count++;
+			pThis->threadJob();
 			Sleep(10);
 		}
-		//std::cout << "Exit Thread" << std::endl;
 		TRACE("\r Exit Thread \n");
 
 		return 0;
 
 	}
+
+	void threadJob()
+	{
+		doRunStep();
+	}
+
+	void doRunStep()
+	{
+		if (m_Continue == FALSE) return;
+
+		m_Number++;
+		CString get_str;
+		get_str.Format(L"Get No:%d", m_Number);
+		CString* send_msg;
+		send_msg = (CString *)m_Qbuf->Write(&get_str);
+		SendMsg(send_msg, m_Number);
+
+		if (m_isrFunc != nullptr)
+		{
+			(*m_isrFunc)(m_object, get_str, m_closure);
+		}
+	}
+
 
 	void SuspendThread()
 	{
@@ -255,12 +317,32 @@ public:
 	}
 
 
+	void RunThread()
+	{
+		//if (IsRun()) return;
+		m_Continue = TRUE;
+	}
+
+
 
 	void TerminateThread()
 	{
 		if (IsRun())
 		{
-			m_Continue = FALSE;
+			m_ThreadLife = FALSE;
+			DWORD result;
+			result = ::WaitForSingleObject(m_pThread->m_hThread, 1000); // 1초 기다림
+			if (result == WAIT_OBJECT_0)
+			{
+				// 이곳은 스레드를 확실히 종료된 상태임
+				TRACE(L"Terminate Thread OK!");
+			}
+			else if (result == WAIT_TIMEOUT)
+			{
+				// 1초가 지나도 스레도가 종료되지 않음
+				TRACE(L"Terminate Thread Timeout!");
+			}
+
 		}
 	}
 
@@ -274,9 +356,22 @@ public:
 		return FALSE;
 	}
 
+	void SetHwnd(HWND hnd) {
+		m_msgDlg = hnd;
+	}
 
-
-
+	void SendMsg(CString* msg, UINT no) {
+		if (m_msgDlg == nullptr) return;
+		CString* pmsg;
+		CString get_msg;
+		while (1)
+		{
+			if (m_Qbuf->Available() == 0) break;
+			pmsg = (CString*)m_Qbuf->Read(get_msg);
+			//CString*pMsg = new CString (data.GetLogString ());
+			::PostMessage(m_msgDlg, WM_POP_RECEIVE, (WPARAM)no, (LPARAM)pmsg); 
+		}
+	}
 
 };
 

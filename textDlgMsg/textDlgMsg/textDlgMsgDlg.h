@@ -5,6 +5,8 @@
 #pragma once
 #include "popMsg.h"
 
+
+class CUIThread;
 // CtextDlgMsgDlg 대화 상자
 class CtextDlgMsgDlg : public CDialogEx
 {
@@ -12,7 +14,7 @@ class CtextDlgMsgDlg : public CDialogEx
 public:
 	CpopMsg* m_popMsg;
 	CmsgThread* m_thread;
-
+	CUIThread* m_UIThread;
 
 // 생성입니다.
 public:
@@ -44,4 +46,11 @@ public:
 	afx_msg void OnBnClickedBtnPause();
 	afx_msg void OnBnClickedBtnResume();
 	afx_msg void OnBnClickedBtnEnd();
+protected:
+	afx_msg LRESULT OnUserReceive(WPARAM wParam, LPARAM lParam);
+public:
+	CEdit m_EditBox;
+	afx_msg void OnBnClickedBtnThread();
+
+	void SetText(CString& str);
 };

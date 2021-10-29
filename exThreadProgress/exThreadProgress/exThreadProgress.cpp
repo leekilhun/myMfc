@@ -1,43 +1,41 @@
 ﻿
-// textDlgMsg.cpp: 애플리케이션에 대한 클래스 동작을 정의합니다.
+// exThreadProgress.cpp: 애플리케이션에 대한 클래스 동작을 정의합니다.
 //
 
 #include "pch.h"
 #include "framework.h"
-#include "textDlgMsg.h"
-#include "textDlgMsgDlg.h"
+#include "exThreadProgress.h"
+#include "exThreadProgressDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CtextDlgMsgApp
+// CexThreadProgressApp
 
-BEGIN_MESSAGE_MAP(CtextDlgMsgApp, CWinApp)
+BEGIN_MESSAGE_MAP(CexThreadProgressApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CtextDlgMsgApp 생성
+// CexThreadProgressApp 생성
 
-CtextDlgMsgApp::CtextDlgMsgApp()
+CexThreadProgressApp::CexThreadProgressApp()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 	// InitInstance에 모든 중요한 초기화 작업을 배치합니다.
-
-	m_system = nullptr;
 }
 
 
-// 유일한 CtextDlgMsgApp 개체입니다.
+// 유일한 CexThreadProgressApp 개체입니다.
 
-CtextDlgMsgApp theApp;
+CexThreadProgressApp theApp;
 
 
-// CtextDlgMsgApp 초기화
+// CexThreadProgressApp 초기화
 
-BOOL CtextDlgMsgApp::InitInstance()
+BOOL CexThreadProgressApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
@@ -47,11 +45,9 @@ BOOL CtextDlgMsgApp::InitInstance()
 		return FALSE;
 	}
 
-	m_system = new CmsgThread;
-
-	CtextDlgMsgDlg dlg;
+	CexThreadProgressDlg dlg;
 	m_pMainWnd = &dlg;
-	int nResponse = dlg.DoModal();
+	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
 		// TODO: 여기에 [확인]을 클릭하여 대화 상자가 없어질 때 처리할
@@ -68,28 +64,15 @@ BOOL CtextDlgMsgApp::InitInstance()
 		TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
 	}
 
+
 	return FALSE;
 }
 
 
 
-int CtextDlgMsgApp::ExitInstance()
+int CexThreadProgressApp::ExitInstance()
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-	if (m_system != nullptr)
-	{
-		delete m_system;
-		m_system = nullptr;
-	}
 
 	return CWinApp::ExitInstance();
-}
-
-void CtextDlgMsgApp::StaticWrapper(void* obj, const CString& name, void* data)
-{
-	CtextDlgMsgDlg* self = (CtextDlgMsgDlg*)obj;
-	CString tmp;
-	tmp = name;
-
-	self->SetText(tmp);
 }

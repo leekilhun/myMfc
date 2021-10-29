@@ -7,6 +7,7 @@
 #include "textDlgMsg.h"
 #include "textDlgMsgDlg.h"
 #include "afxdialogex.h"
+#include "UIThread.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -22,12 +23,14 @@ CtextDlgMsgDlg::CtextDlgMsgDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_popMsg = nullptr;
 	m_thread = nullptr;
+	m_UIThread = nullptr;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void CtextDlgMsgDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT_1, m_EditBox);
 }
 
 BEGIN_MESSAGE_MAP(CtextDlgMsgDlg, CDialogEx)
@@ -39,6 +42,8 @@ BEGIN_MESSAGE_MAP(CtextDlgMsgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PAUSE, &CtextDlgMsgDlg::OnBnClickedBtnPause)
 	ON_BN_CLICKED(IDC_BTN_RESUME, &CtextDlgMsgDlg::OnBnClickedBtnResume)
 	ON_BN_CLICKED(IDC_BTN_END, &CtextDlgMsgDlg::OnBnClickedBtnEnd)
+	ON_MESSAGE(WM_USER_RECEIVE, &CtextDlgMsgDlg::OnUserReceive)
+	ON_BN_CLICKED(IDC_BTN_THREAD, &CtextDlgMsgDlg::OnBnClickedBtnThread)
 END_MESSAGE_MAP()
 
 
@@ -58,7 +63,13 @@ BOOL CtextDlgMsgDlg::OnInitDialog()
 	CtextDlgMsgApp*main = (CtextDlgMsgApp*)AfxGetApp();
 	m_thread = main->GetSystem();
 	//m_thread = theApp.GetSystem();
-	m_thread->RunThread();
+	
+	/*m_thread->SetHwnd(this->GetSafeHwnd());
+	m_thread->ThreadRun();*/
+	int closure = 16;
+	m_thread->ThreadRun();
+	m_thread->SetIRS(this, main->StaticWrapper, &closure);
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -104,10 +115,10 @@ HCURSOR CtextDlgMsgDlg::OnQueryDragIcon()
 void CtextDlgMsgDlg::OnBnClickedBtnStart()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	if (m_thread->IsRun() == FALSE)
-	{
-		m_thread->StartThread(NULL);
-	}
+		m_thread->RunThread();
+
+		if (m_thread->m_Continue == FALSE)
+			m_thread->m_Continue = TRUE;
 }
 
 
@@ -120,36 +131,9 @@ void CtextDlgMsgDlg::OnBnClickedBtnPop()
 		m_popMsg->setter(this);
 		m_popMsg->Create(IDD_DLG_CHILD1); //, CWnd::GetDesktopWindow()
 	}
-
 	m_popMsg->ShowWindow(SW_SHOW);
-
 }
 
-
-BOOL CtextDlgMsgDlg::DestroyWindow()
-{
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-
-	return CDialogEx::DestroyWindow();
-}
-
-
-void CtextDlgMsgDlg::OnDestroy()
-{
-	CDialogEx::OnDestroy();
-
-	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
-	if (m_popMsg != nullptr)
-	{
-		delete m_popMsg;
-		m_popMsg = nullptr;
-	}
-
-	if (m_thread != nullptr)
-	{
-		m_thread = nullptr;
-	}
-}
 
 
 void CtextDlgMsgDlg::OnBnClickedBtnPause()
@@ -170,4 +154,79 @@ void CtextDlgMsgDlg::OnBnClickedBtnEnd()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_thread->TerminateThread();
+}
+
+
+afx_msg LRESULT CtextDlgMsgDlg::OnUserReceive(WPARAM wParam, LPARAM lParam)
+{
+	int no = (int)wParam;
+	CString* msg;
+	msg = ((CString*)lParam);
+	CString result = msg->GetString();
+
+	CString pre_str;
+	if (m_EditBox.GetLineCount() < 10)
+		GetDlgItemText(IDC_EDIT_1, pre_str);
+
+	m_EditBox.SetWindowText(pre_str + result + L"\r\n");
+
+
+	return 0;
+}
+
+
+void CtextDlgMsgDlg::OnBnClickedBtnThread()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	//m_UIThread = new CUIThread();
+	//m_UIThread->CreateThread();
+	AfxBeginThread(RUNTIME_CLASS(CUIThread));
+
+
+}
+
+void CtextDlgMsgDlg::SetText(CString& str)
+{
+	CString pre_str;
+	if (m_EditBox.GetLineCount() < 10)
+		GetDlgItemText(IDC_EDIT_1, pre_str);
+	
+	m_EditBox.SetWindowText(pre_str + str + L"\r\n");
+}
+
+
+
+void CtextDlgMsgDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+
+	if (m_UIThread != nullptr)
+	{
+		m_UIThread->PostThreadMessage(WM_QUIT, 0, 0);
+
+		delete m_UIThread;
+		m_UIThread = nullptr;
+	}
+
+	if (m_popMsg != nullptr)
+	{
+		delete m_popMsg;
+		m_popMsg = nullptr;
+	}
+
+	if (m_thread != nullptr)
+	{
+		m_thread->TerminateThread();
+		Sleep(10);
+		m_thread = nullptr;
+	}
+
+}
+
+BOOL CtextDlgMsgDlg::DestroyWindow()
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	return CDialogEx::DestroyWindow();
 }
