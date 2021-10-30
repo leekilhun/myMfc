@@ -193,6 +193,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="textDlgMsg.h" />
     <ClInclude Include="textDlgMsgDlg.h" />
+    <ClInclude Include="tTimer.h" />
     <ClInclude Include="UIThread.h" />
   </ItemGroup>
   <ItemGroup>

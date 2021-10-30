@@ -20,6 +20,7 @@ class CtextDlgMsgApp : public CWinApp
 {
 public:
 	CmsgThread* m_system;
+	CtimeScheduler* m_pTimeScheduler;
 
 public:
 	CtextDlgMsgApp();

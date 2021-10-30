@@ -53,4 +53,5 @@ public:
 	afx_msg void OnBnClickedBtnThread();
 
 	void SetText(CString& str);
+	static void SetPassTime(LPVOID pParam);
 };

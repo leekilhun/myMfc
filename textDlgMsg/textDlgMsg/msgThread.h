@@ -324,11 +324,12 @@ public:
 	}
 
 
-
 	void TerminateThread()
 	{
 		if (IsRun())
 		{
+			m_pThread->ResumeThread();
+			
 			m_ThreadLife = FALSE;
 			DWORD result;
 			result = ::WaitForSingleObject(m_pThread->m_hThread, 1000); // 1초 기다림

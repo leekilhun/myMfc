@@ -13,4 +13,6 @@
 typedef void (*CallbackType)(void* obj, const CString& name, void* data);
 #define WM_USER_RECEIVE   WM_USER + 1000
 #define WM_POP_RECEIVE   WM_USER + 1001
+
+#include "tTimer.h"
 #endif //PCH_H

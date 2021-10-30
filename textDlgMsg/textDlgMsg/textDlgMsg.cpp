@@ -11,7 +11,9 @@
 #define new DEBUG_NEW
 #endif
 
-
+static void TestAdd() {
+	AfxMessageBox(L"Test Add \n");
+}
 // CtextDlgMsgApp
 
 BEGIN_MESSAGE_MAP(CtextDlgMsgApp, CWinApp)
@@ -27,6 +29,7 @@ CtextDlgMsgApp::CtextDlgMsgApp()
 	// InitInstance에 모든 중요한 초기화 작업을 배치합니다.
 
 	m_system = nullptr;
+	m_pTimeScheduler = nullptr;
 }
 
 
@@ -49,6 +52,11 @@ BOOL CtextDlgMsgApp::InitInstance()
 
 	m_system = new CmsgThread;
 
+	m_pTimeScheduler = new CtimeScheduler(CtimeScheduler::eTickType::ms_1000);
+
+	//m_pTimeScheduler->AttachCallbackFunc(TestAdd);
+
+
 	CtextDlgMsgDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
@@ -64,6 +72,7 @@ BOOL CtextDlgMsgApp::InitInstance()
 	}
 	else if (nResponse == -1)
 	{
+		AfxMessageBox(L"메인 Dialog가 예기치 않게 종료 되었습니다.");
 		TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 애플리케이션이 예기치 않게 종료됩니다.\n");
 		TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
 	}
@@ -80,6 +89,13 @@ int CtextDlgMsgApp::ExitInstance()
 	{
 		delete m_system;
 		m_system = nullptr;
+	}
+
+	if (m_pTimeScheduler != nullptr)
+	{
+		
+		delete m_pTimeScheduler;
+		m_pTimeScheduler = nullptr;
 	}
 
 	return CWinApp::ExitInstance();

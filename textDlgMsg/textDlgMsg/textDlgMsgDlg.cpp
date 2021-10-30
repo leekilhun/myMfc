@@ -70,6 +70,11 @@ BOOL CtextDlgMsgDlg::OnInitDialog()
 	m_thread->ThreadRun();
 	m_thread->SetIRS(this, main->StaticWrapper, &closure);
 
+	main->m_pTimeScheduler->AttachCallbackFunc(this, SetPassTime);
+	main->m_pTimeScheduler->Start();
+	
+
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -140,6 +145,7 @@ void CtextDlgMsgDlg::OnBnClickedBtnPause()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_thread->SuspendThread();
+	/* 이 상태에서 종료시 정상 종료가 안됨*/
 }
 
 
@@ -194,12 +200,32 @@ void CtextDlgMsgDlg::SetText(CString& str)
 	m_EditBox.SetWindowText(pre_str + str + L"\r\n");
 }
 
+void CtextDlgMsgDlg::SetPassTime(LPVOID pParam)
+{
+	CtextDlgMsgDlg* pThis;
+	pThis = (CtextDlgMsgDlg*)pParam;
+	CString pre_str;
+	if (pThis->m_EditBox.GetLineCount() < 10)
+		pThis->GetDlgItemText(IDC_EDIT_1, pre_str);
+
+	
+	pThis->m_EditBox.SetWindowText(pre_str + L"Test" + L"\r\n");
+
+}
+
 
 
 void CtextDlgMsgDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+
+	CtextDlgMsgApp* main = (CtextDlgMsgApp*)AfxGetApp();
+	m_thread = main->GetSystem();
+
+	main->m_pTimeScheduler->Stop();
+	main->m_pTimeScheduler->EndThread();
+
 
 	if (m_UIThread != nullptr)
 	{
@@ -215,8 +241,16 @@ void CtextDlgMsgDlg::OnDestroy()
 		m_popMsg = nullptr;
 	}
 
+	CtTimer t;
+	m_thread->ResumeThread();
+	t.Start();
+	while (1)	{	
+		if (t.MoreThan(1)) break;	
+	}
+
 	if (m_thread != nullptr)
 	{
+		
 		m_thread->TerminateThread();
 		Sleep(10);
 		m_thread = nullptr;
