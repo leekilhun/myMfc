@@ -225,7 +225,6 @@ public:
 	}
 	virtual ~CmsgThread() { 
 		m_Continue = FALSE;
-		TerminateThread();
 		if (m_pThread != nullptr)
 		{
 			//delete m_pThread;
@@ -263,13 +262,13 @@ public:
 	{
 		CmsgThread* pThis;
 		pThis = (CmsgThread*)pParam;
-		TRACE("\r Start Thread \n");
+		TRACE("\r Start Work Thread \n");
 		while (pThis->m_ThreadLife)
 		{
 			pThis->threadJob();
-			Sleep(10);
+			Sleep(30);
 		}
-		TRACE("\r Exit Thread \n");
+		TRACE("\r Exit Work Thread \n");
 
 		return 0;
 
@@ -291,8 +290,7 @@ public:
 		send_msg = (CString *)m_Qbuf->Write(&get_str);
 		SendMsg(send_msg, m_Number);
 
-		if (m_isrFunc != nullptr)
-		{
+		if (m_isrFunc != nullptr)	{
 			(*m_isrFunc)(m_object, get_str, m_closure);
 		}
 	}
@@ -331,19 +329,28 @@ public:
 			m_pThread->ResumeThread();
 			
 			m_ThreadLife = FALSE;
+			/*CtTimer t;
+			t.Start();
+			while (1) {
+				if (t.MoreThan(1)) break;
+			}*/
+
+
 			DWORD result;
-			result = ::WaitForSingleObject(m_pThread->m_hThread, 1000); // 1초 기다림
+			result = ::WaitForSingleObject(m_pThread->m_hThread, 5* 1000); // 1초 기다림
 			if (result == WAIT_OBJECT_0)
 			{
 				// 이곳은 스레드를 확실히 종료된 상태임
-				TRACE(L"Terminate Thread OK!");
+				TRACE(L"\r Terminate Work Thread OK! \n");
 			}
 			else if (result == WAIT_TIMEOUT)
 			{
 				// 1초가 지나도 스레도가 종료되지 않음
-				TRACE(L"Terminate Thread Timeout!");
+				TRACE(L"\r Terminate Work Thread Timeout! \n");
+				::TerminateThread(m_pThread->m_hThread, 1);
+				::CloseHandle(m_pThread->m_hThread);				
 			}
-
+			m_pThread = nullptr;
 		}
 	}
 

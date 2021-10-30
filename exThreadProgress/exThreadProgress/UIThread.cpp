@@ -12,7 +12,7 @@ int CUIThread::run()
   while (m_mainDlg->m_lifeThreadUI)    
   { 
     job();
-    Sleep(1);
+    Sleep(20);
   }    
 
   m_mainDlg->GetDlgItem(IDC_BTN_START_UI)->EnableWindow(TRUE);

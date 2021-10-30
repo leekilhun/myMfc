@@ -147,8 +147,8 @@ public:
 	enum class eTickType
 	{
 		none = -1,
-		ms_10,
 		ms_20,
+		ms_50,
 		ms_100,
 		ms_1000,
 
@@ -204,7 +204,7 @@ private:
 		while (pThis->m_threadLife)
 		{
 			pThis->timerISR();
-			Sleep(1);
+			Sleep(20);
 		}
 		TRACE("\r Exit Time Thread \n");
 
@@ -218,22 +218,26 @@ private:
 		ULONGLONG value = 0;
 		m_vluPass = m_timer.GetElaspTime_ms() ;
 
-
+		CString str;
+		//str.Format(L"%ld", m_vluPass);
+		str = getNowFormat();
 		if (func_Callback != nullptr)		{
 			switch (m_type)
 			{
-			case eTickType::ms_10:
+			case eTickType::ms_20:
 			{
-				if (m_vluPass > 10) {
-					(*func_Callback)(m_obj);
+				if (m_vluPass > 20) {
+					//(*func_Callback)(m_obj);
+					m_callback(m_obj, str, NULL);
 					m_timer.Start();
 				}
 			}
 			break;
-			case eTickType::ms_20:
+			case eTickType::ms_50:
 			{
-				if (m_vluPass > 20) {
-					(*func_Callback)(m_obj);
+				if (m_vluPass > 50) {
+					//(*func_Callback)(m_obj);
+					m_callback(m_obj, str, NULL);
 					m_timer.Start();
 				}
 			}
@@ -241,7 +245,8 @@ private:
 			case eTickType::ms_100:
 			{
 				if (m_vluPass > 100) {
-					(*func_Callback)(m_obj);
+					//(*func_Callback)(m_obj);
+					m_callback(m_obj, str, NULL);
 					m_timer.Start();
 				}
 			}
@@ -249,7 +254,8 @@ private:
 			case eTickType::ms_1000:
 			{
 				if (m_vluPass > 1000) {
-					(*func_Callback)(m_obj);
+					//(*func_Callback)(m_obj);
+					m_callback(m_obj, str, NULL);
 					m_timer.Start();
 				}
 			}
@@ -262,30 +268,52 @@ private:
 
 		m_threadLife = FALSE;
 		
-		/*
-		CtTimer t;
+		
+		/*CtTimer t;
 		t.Start();
 		while (1) {
 			if (t.MoreThan(0.5)) break;
-		}
-		*/
+		}*/
+		
 		if (m_thread == nullptr) 
 			return;
 		
 		DWORD result;
-		result = ::WaitForSingleObject(m_thread->m_hThread, 1000); // 1초 기다림
+		result = ::WaitForSingleObject(m_thread->m_hThread, 5*1000); // 1초 기다림
 		if (result == WAIT_OBJECT_0)
 		{
 			// 이곳은 스레드를 확실히 종료된 상태임
-			TRACE(L"Terminate Thread OK!");
+			TRACE(L"\rTerminate Timer Thread OK!\n");
 		}
 		else if (result == WAIT_TIMEOUT)
 		{
 			// 1초가 지나도 스레도가 종료되지 않음
-			TRACE(L"Terminate Thread Timeout!");
-			::TerminateThread(m_thread->m_hThread, result);
+			TRACE(L"\rTerminate Timer Thread Timeout!\n");
+			::TerminateThread(m_thread->m_hThread, 1);
+			::CloseHandle(m_thread->m_hThread);
 		}
+		m_thread = nullptr;
 	}
+
+	CString getNowFormat()
+	{
+		CString date_now;
+		SYSTEMTIME	systemDate;
+
+		::GetLocalTime(&systemDate);
+
+		date_now.Format(_T("[%04d-%02d-%02d][%02d:%02d:%02d] "),
+			systemDate.wYear,
+			systemDate.wMonth,
+			systemDate.wDay,
+			systemDate.wHour,
+			systemDate.wMinute,
+			systemDate.wSecond);
+
+		return date_now;
+	}
+
+
 
 public:
 	int Start() { 
@@ -311,11 +339,12 @@ public:
 	}
 
 	void AttachCallbackFunc(LPVOID obj, void (*func)(LPVOID)){
+		m_obj = obj; 
 		func_Callback = func;
-		m_obj = obj;
 	}
 
-	void AddISRFunc(CallbackType cb) {
+	void AddISRFunc(LPVOID obj, CallbackType cb) {
+		m_obj = obj;
 		m_callback = cb;
 	}
 

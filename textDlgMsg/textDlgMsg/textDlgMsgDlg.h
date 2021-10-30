@@ -54,4 +54,9 @@ public:
 
 	void SetText(CString& str);
 	static void SetPassTime(LPVOID pParam);
+	static void SetMsg(void* obj, const CString& str, void* data);
+	CEdit m_EditBox2;
+	afx_msg void OnBnClickedBtnEnd2();
+//	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedBtnClose();
 };

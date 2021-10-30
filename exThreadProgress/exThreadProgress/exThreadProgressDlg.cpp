@@ -157,7 +157,7 @@ UINT CexThreadProgressDlg::WorkThread(LPVOID lParam)
 			//dlg->SetDlgItemTextW(IDC_STATIC_UI, str);
 		}
 		i++;
-		Sleep(1);
+		Sleep(30);
 
 	}
 	dlg->GetDlgItem(IDC_BTN_START_WT)->EnableWindow(TRUE);
@@ -169,12 +169,12 @@ UINT CexThreadProgressDlg::ThreadFunc(LPVOID lParam)
 {
 	CexThreadProgressDlg* pThis;
 	pThis = (CexThreadProgressDlg*)lParam;
-	TRACE(_T("threadWT Run\n"));
+	TRACE(_T("\r threadWT Run\n"));
 	// Thread Loop
 	while (pThis->m_lifeThreadWT)
 	{
 		pThis->threadJob();
-		Sleep(1);
+		Sleep(10);
 	}
 	pThis->GetDlgItem(IDC_BTN_START_WT)->EnableWindow(TRUE);
 	TRACE("\r Exit Work Thread \n");
@@ -189,7 +189,7 @@ void CexThreadProgressDlg::StopThread()
 	DWORD result;
 	if (m_threadWT != nullptr)
 	{
-		result = ::WaitForSingleObject(m_threadWT->m_hThread, 1 * 1000);
+		result = ::WaitForSingleObject(m_threadWT->m_hThread, 2 * 1000);
 		if (result == WAIT_OBJECT_0)
 		{
 			// 이곳은 스레드를 확실히 종료된 상태임
@@ -209,7 +209,7 @@ void CexThreadProgressDlg::StopThread()
 	result = 0;
 	if (m_threadUI != nullptr)
 	{
-		result = ::WaitForSingleObject(m_threadUI->m_hThread, 1 * 1000);
+		result = ::WaitForSingleObject(m_threadUI->m_hThread, 2 * 1000);
 		if (result == WAIT_OBJECT_0)
 		{
 			// 이곳은 스레드를 확실히 종료된 상태임

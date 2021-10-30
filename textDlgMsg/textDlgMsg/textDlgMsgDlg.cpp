@@ -31,6 +31,7 @@ void CtextDlgMsgDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT_1, m_EditBox);
+	DDX_Control(pDX, IDC_EDIT_2, m_EditBox2);
 }
 
 BEGIN_MESSAGE_MAP(CtextDlgMsgDlg, CDialogEx)
@@ -44,6 +45,9 @@ BEGIN_MESSAGE_MAP(CtextDlgMsgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_END, &CtextDlgMsgDlg::OnBnClickedBtnEnd)
 	ON_MESSAGE(WM_USER_RECEIVE, &CtextDlgMsgDlg::OnUserReceive)
 	ON_BN_CLICKED(IDC_BTN_THREAD, &CtextDlgMsgDlg::OnBnClickedBtnThread)
+	ON_BN_CLICKED(IDC_BTN_END2, &CtextDlgMsgDlg::OnBnClickedBtnEnd2)
+//	ON_BN_CLICKED(IDCANCEL, &CtextDlgMsgDlg::OnBnClickedCancel)
+ON_BN_CLICKED(IDC_BTN_CLOSE, &CtextDlgMsgDlg::OnBnClickedBtnClose)
 END_MESSAGE_MAP()
 
 
@@ -70,7 +74,10 @@ BOOL CtextDlgMsgDlg::OnInitDialog()
 	m_thread->ThreadRun();
 	m_thread->SetIRS(this, main->StaticWrapper, &closure);
 
-	main->m_pTimeScheduler->AttachCallbackFunc(this, SetPassTime);
+
+	//main->m_pTimeScheduler->AttachCallbackFunc(this, SetPassTime);
+	main->m_pTimeScheduler->AddISRFunc(this, SetMsg);
+	
 	main->m_pTimeScheduler->Start();
 	
 
@@ -156,11 +163,6 @@ void CtextDlgMsgDlg::OnBnClickedBtnResume()
 }
 
 
-void CtextDlgMsgDlg::OnBnClickedBtnEnd()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_thread->TerminateThread();
-}
 
 
 afx_msg LRESULT CtextDlgMsgDlg::OnUserReceive(WPARAM wParam, LPARAM lParam)
@@ -194,10 +196,10 @@ void CtextDlgMsgDlg::OnBnClickedBtnThread()
 void CtextDlgMsgDlg::SetText(CString& str)
 {
 	CString pre_str;
-	if (m_EditBox.GetLineCount() < 10)
-		GetDlgItemText(IDC_EDIT_1, pre_str);
+	if (m_EditBox2.GetLineCount() < 10)
+		GetDlgItemText(IDC_EDIT_2, pre_str);
 	
-	m_EditBox.SetWindowText(pre_str + str + L"\r\n");
+	m_EditBox2.SetWindowText(pre_str + str + L"\r\n");
 }
 
 void CtextDlgMsgDlg::SetPassTime(LPVOID pParam)
@@ -205,11 +207,23 @@ void CtextDlgMsgDlg::SetPassTime(LPVOID pParam)
 	CtextDlgMsgDlg* pThis;
 	pThis = (CtextDlgMsgDlg*)pParam;
 	CString pre_str;
+	if (pThis->m_EditBox2.GetLineCount() < 10)
+		pThis->GetDlgItemText(IDC_EDIT_2, pre_str);
+
+	
+	pThis->m_EditBox2.SetWindowText(pre_str + L"Test" + L"\r\n");
+
+}
+
+void CtextDlgMsgDlg::SetMsg(void* obj, const CString& str, void* data)
+{
+	CtextDlgMsgDlg* pThis;
+	pThis = (CtextDlgMsgDlg*)obj;
+	CString pre_str;
 	if (pThis->m_EditBox.GetLineCount() < 10)
 		pThis->GetDlgItemText(IDC_EDIT_1, pre_str);
 
-	
-	pThis->m_EditBox.SetWindowText(pre_str + L"Test" + L"\r\n");
+	pThis->m_EditBox.SetWindowText(pre_str + str + L"\r\n");
 
 }
 
@@ -220,11 +234,29 @@ void CtextDlgMsgDlg::OnDestroy()
 	CDialogEx::OnDestroy();
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 
-	CtextDlgMsgApp* main = (CtextDlgMsgApp*)AfxGetApp();
-	m_thread = main->GetSystem();
+}
 
-	main->m_pTimeScheduler->Stop();
-	main->m_pTimeScheduler->EndThread();
+BOOL CtextDlgMsgDlg::DestroyWindow()
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	OnBnClickedBtnEnd2();
+	//Sleep(20);
+	OnBnClickedBtnEnd();
+
+	/*CtTimer t;
+	m_thread->ResumeThread();
+	t.Start();
+	while (1)	{
+		if (t.MoreThan(1)) break;
+	}*/
+
+	//if (m_thread != nullptr)
+	//{
+
+	//	m_thread->TerminateThread();
+	//	//Sleep(50);
+	//	m_thread = nullptr;
+	//}
 
 
 	if (m_UIThread != nullptr)
@@ -241,26 +273,43 @@ void CtextDlgMsgDlg::OnDestroy()
 		m_popMsg = nullptr;
 	}
 
-	CtTimer t;
-	m_thread->ResumeThread();
-	t.Start();
-	while (1)	{	
-		if (t.MoreThan(1)) break;	
-	}
-
-	if (m_thread != nullptr)
-	{
-		
-		m_thread->TerminateThread();
-		Sleep(10);
-		m_thread = nullptr;
-	}
-
+	return CDialogEx::DestroyWindow();
 }
 
-BOOL CtextDlgMsgDlg::DestroyWindow()
+void CtextDlgMsgDlg::OnBnClickedBtnEnd()
 {
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_thread->TerminateThread();
+}
 
-	return CDialogEx::DestroyWindow();
+
+void CtextDlgMsgDlg::OnBnClickedBtnEnd2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CtextDlgMsgApp* main = (CtextDlgMsgApp*)AfxGetApp();
+	m_thread = main->GetSystem();
+	if (main->m_pTimeScheduler != nullptr) {
+		main->m_pTimeScheduler->Stop();
+		main->m_pTimeScheduler->EndThread();
+		//delete main->m_pTimeScheduler;
+		//main->m_pTimeScheduler = nullptr;
+		
+	}
+}
+
+
+//void CtextDlgMsgDlg::OnBnClickedCancel()
+//{
+//	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+//	CDialogEx::OnCancel();
+//}
+
+
+void CtextDlgMsgDlg::OnBnClickedBtnClose()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	OnBnClickedBtnEnd2();
+	//Sleep(20);
+	OnBnClickedBtnEnd();
+	::SendMessage(this->m_hWnd, WM_CLOSE, NULL, NULL);
 }
