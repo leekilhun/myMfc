@@ -36,6 +36,15 @@
     <ClInclude Include="UIThread.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="popDash.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="qBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tTimer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="exMultiThread.cpp">
@@ -48,6 +57,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="UIThread.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="popDash.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

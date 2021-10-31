@@ -26,12 +26,19 @@ CexMultiThreadDlg::CexMultiThreadDlg(CWnd* pParent /*=nullptr*/)
 void CexMultiThreadDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST1, m_listBd);
+	DDX_Control(pDX, IDC_EDIT_NUM, m_playerCnt);
+	DDX_Control(pDX, IDC_SPIN_CNT, m_spCnt);
 }
 
 BEGIN_MESSAGE_MAP(CexMultiThreadDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_TERMINATE, &CexMultiThreadDlg::OnBnClickedBtnTerminate)
+	ON_BN_CLICKED(IDC_BTN_STOP, &CexMultiThreadDlg::OnBnClickedBtnStop)
+	ON_BN_CLICKED(IDC_BTN_START, &CexMultiThreadDlg::OnBnClickedBtnStart)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_CNT, &CexMultiThreadDlg::OnDeltaposSpinCnt)
+	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
@@ -48,7 +55,9 @@ BOOL CexMultiThreadDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 
-
+	m_playerCnt.SetWindowTextW(L"0");
+	m_spCnt.SetRange(0, 10);
+	m_spCnt.SetPos(0);
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -95,4 +104,44 @@ HCURSOR CexMultiThreadDlg::OnQueryDragIcon()
 void CexMultiThreadDlg::OnBnClickedBtnTerminate()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	::SendMessage(this->m_hWnd, WM_CLOSE, NULL, NULL);
+}
+
+
+void CexMultiThreadDlg::OnBnClickedBtnStop()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CexMultiThreadDlg::OnBnClickedBtnStart()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CexMultiThreadDlg::OnDeltaposSpinCnt(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int val = pNMUpDown->iPos + pNMUpDown->iDelta;
+	if (Between(val,0,10) == TRUE)
+	{
+		CString str_vlu;
+		str_vlu.Format(L"%d\n", val);
+		m_playerCnt.SetWindowText(str_vlu);
+	}
+	*pResult = 0;
+}
+
+
+void CexMultiThreadDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	CDialogEx::OnShowWindow(bShow, nStatus);
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	CreateWindow(_T("static"), _T("Only Text"), WS_CHILD | WS_VISIBLE,
+		20, 85, 100, 25, this->m_hWnd, (HMENU)-1/*(HMENU)109*/, NULL, NULL);
+
 }

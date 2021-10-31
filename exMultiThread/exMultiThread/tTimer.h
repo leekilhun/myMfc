@@ -1,6 +1,9 @@
 #pragma once
 #include "pch.h"
 
+typedef void (*CallbackType)(void* obj, const CString& name, void* data);
+
+
 const int DEF_TIMER_SUCCESS					= 0;
 const int ERR_TIMER_NOT_STARTED			= 1;
 const int ERR_TIMER_ALREADY_STARTED = 2;

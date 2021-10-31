@@ -187,8 +187,11 @@
     <ClInclude Include="exMultiThreadDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="popDash.h" />
+    <ClInclude Include="qBuffer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="tTimer.h" />
     <ClInclude Include="UIThread.h" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +203,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="popDash.cpp" />
     <ClCompile Include="UIThread.cpp" />
   </ItemGroup>
   <ItemGroup>

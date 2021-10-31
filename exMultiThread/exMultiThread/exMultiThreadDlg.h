@@ -32,4 +32,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnTerminate();
+	CListBox m_listBd;
+	afx_msg void OnBnClickedBtnStop();
+	afx_msg void OnBnClickedBtnStart();
+	CEdit m_playerCnt;
+	CSpinButtonCtrl m_spCnt;
+	afx_msg void OnDeltaposSpinCnt(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 };
