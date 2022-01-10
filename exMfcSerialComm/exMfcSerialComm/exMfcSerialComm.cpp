@@ -71,8 +71,8 @@ BOOL CexMfcSerialCommApp::InitInstance()
 
 	EnableTaskbarInteraction(FALSE);
 
-	// RichEdit 컨트롤을 사용하려면 AfxInitRichEdit2()가 있어야 합니다.
-	// AfxInitRichEdit2();
+	//RichEdit 컨트롤을 사용하려면 AfxInitRichEdit2()가 있어야 합니다.
+	AfxInitRichEdit2();
 
 	// 표준 초기화
 	// 이들 기능을 사용하지 않고 최종 실행 파일의 크기를 줄이려면

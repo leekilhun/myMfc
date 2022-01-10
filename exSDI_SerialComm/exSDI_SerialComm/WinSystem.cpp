@@ -56,8 +56,8 @@ void MWinSystem::startThread()
 int MWinSystem::_createBasicHWComponents()
 {
 	m_HwSerialComm = new CThreadComm();
-	CString port_name = _T("COM26");
-	WORD port_id = 26;
+	CString port_name = _T("COM10");
+	WORD port_id = 10;
 	if (!m_HwSerialComm->OpenPort(port_name, 115200, port_id))
 		AfxMessageBox(L"connect faliled");
 	else

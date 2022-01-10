@@ -206,6 +206,9 @@ void CCommRs232::ClosePort()
 	m_IsConnected = FALSE;
 	// 모든 Event mask를 없앤다.
 	SetCommMask(m_hComm, 0);
+
+	while (m_hThreadWatchComm != NULL);
+
 	// 통신 Queue들을 초기화 한다.
 	PurgeComm(m_hComm, PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR);
 	// 파일 핸들을 닫는다.
@@ -356,7 +359,8 @@ DWORD ThreadWatchComm(CCommRs232* pComm)
 
 			//TRACE(traceAppMsg, 0, "데이터를 받았습니다.\r\n");
 			// 읽어가도록 메시지를 보낸다.
-			::PostMessage(pComm->m_hCommWnd, WM_COMM_RS232_MESSAGE, pComm->m_wPortID, 0);
+			if(pComm->m_QueueRead.m_Head != pComm->m_QueueRead.m_Tail)
+				::PostMessage(pComm->m_hCommWnd, WM_COMM_RS232_MESSAGE, pComm->m_wPortID, 0);
 			//TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 응용 프로그램이 예기치 않게 종료됩니다.\n");
 		}
 	}
