@@ -1,0 +1,3 @@
+
+#define WM_COMM_RS232_MESSAGE							(WM_USER+2)		//
+#define WM_NEXTION_LCD_MAIN_DLG_MESSAGE		(WM_USER+3)		//
