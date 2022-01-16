@@ -10,6 +10,7 @@ class CnextionLCDDlg : public CDialogEx
 {
 	UINT_PTR	m_TimerID;
 	nextionCommLcd* m_pLcd;
+	bool m_isAutoReady;
 
 // 생성입니다.
 public:
@@ -38,7 +39,11 @@ public:
 	CComboBox m_comboBaudrateList;
 	CButton m_sensor[8];
 	CButton m_led[8];
-
+	CButton m_bitState[32];
+	CListBox m_recvList;
+	CButton m_btnStart;
+	CButton m_btnStop;
+	CButton m_btnReset;
 
 	afx_msg void OnBnClickedBtnConnect();
 
@@ -49,7 +54,16 @@ public:
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 protected:
 	afx_msg LRESULT OnUpdateCommLogList(WPARAM wParam, LPARAM lParam);
+
+private:
+	void AutoReady(bool on_off = false);
 public:
-	CListBox m_recvList;
+	
 	afx_msg void OnLbnDblclkListRcvLog();
+	afx_msg void OnBnClickedBtnStart();
+	afx_msg void OnBnClickedBtnStop();
+	afx_msg void OnBnClickedBtnReset();
+
+
+	
 };

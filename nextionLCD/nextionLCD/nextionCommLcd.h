@@ -4,8 +4,14 @@
 
 #include "jL_logManager.h"
 
-#define CMD_MAX_DATA_LENGTH 24
-
+#define CMD_MAX_DATA_LENGTH			24
+#define DEF_NEX_PAGE_INIT			  0
+#define DEF_NEX_PAGE_MAIN				1
+#define DEF_NEX_PAGE_MANUAL			2
+#define DEF_NEX_PAGE_TEACH			3
+#define DEF_NEX_PAGE_IO					4
+#define DEF_NEX_PAGE_DATA				5
+#define DEF_NEX_PAGE_LOG				6
 class nextionCommLcd
 {
 	enum class cmd_state
@@ -88,7 +94,7 @@ public:
 
 	bool m_lifeThread;
 
-	string m_lastLog;
+	string m_lastLog[2];
 
 
 	// Main gui 윈도우 핸들
@@ -117,6 +123,10 @@ public:
 
 	void ThreadRun();
 	void ThreadStop();
+
+	int GetLCDPageNo();
+	void SetOutputReg(uint16_t value);
+	void ChangeLCDPage(int page_no);
 
 	static int WrapFunc(void* obj) {
 		nextionCommLcd* self = (nextionCommLcd*)(obj);

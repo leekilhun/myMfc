@@ -18,8 +18,8 @@
 
 #define CMD_SEND_ETX                0xff 0xff 0xff
 
-#define DEF_MCU_TO_OP_IN_REG_STR(x)        "cc_rcv_in=%d",x
-#define DEF_MCU_TO_OP_OUT_REG_STR(x)       "cc_rcv_out=%d",x
+#define DEF_MCU_TO_OP_IN_REG        0
+#define DEF_MCU_TO_OP_OUT_REG       1
 #define DEF_MCU_TO_OP_RESET_LOG            "cc_rcv_out=%d \r"
 
 
@@ -63,6 +63,8 @@ nextionCommLcd::nextionCommLcd()
 
 nextionCommLcd::~nextionCommLcd()
 {
+
+	ThreadStop();
 
 	if (m_NextionComm.rx_packet.data != nullptr)
 	{
@@ -131,6 +133,8 @@ void nextionCommLcd::threadJob()
 	if (m_IsPortOpen)
 	{
 		sendIoReg();
+		Sleep(20);
+		updateOutReg();
 	}
 
 }
@@ -150,11 +154,11 @@ void nextionCommLcd::sendIoReg()
 
 	if (m_hCommWnd != nullptr)
 	{		
-		if (m_lastLog != strTmp)
+		if (m_lastLog[DEF_MCU_TO_OP_IN_REG] != strTmp)
 		{
-			m_lastLog = strTmp;
+			m_lastLog[DEF_MCU_TO_OP_IN_REG] = strTmp;
 			strTmp.push_back('\0');
-			uint32_t pop_addr = m_log->PutLog("[MCU -> LCD] : %s", strTmp.c_str());
+			uint32_t pop_addr = m_log->PutLog_info("[MCU -> LCD] : %s", strTmp.c_str());
 			::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
 		}
 	}
@@ -164,36 +168,41 @@ void nextionCommLcd::sendIoReg()
 
 void nextionCommLcd::updateOutReg()
 {
+	uint16_t value = 0;
 	if (m_NextionComm.rx_packet.length == 2)
 	{
-		uint16_t value = 0;
 		value = m_NextionComm.rx_packet.data[0];
 		value |= m_NextionComm.rx_packet.data[1] << 8;
 		m_armStatus.output_reg = value;
-
-		uint8_t temp[255] = { 0, };
-		size_t len = 0;
-		sprintf_s((char*)temp, sizeof(temp), "cc_rcv_out=%d", value);
-		len = strnlen_s((char*)temp, 255);
-
-		string  strTmp ((char*)&temp[0], len);
-		temp[255 - 1] = '\0';
-		temp[len++ % 255] = 0xff;
-		temp[len++ % 255] = 0xff;
-		temp[len++ % 255] = 0xff;
-
-		if (m_hCommWnd != nullptr)
-		{
-			if (m_lastLog != strTmp)
-			{
-				m_lastLog = strTmp;
-				strTmp.push_back('\0');
-				uint32_t pop_addr = m_log->PutLog("[MCU -> LCD] : %s", strTmp.c_str());
-				::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
-			}
-		}
-		m_ComPort->WriteByte((BYTE*)&temp[0], (UINT)(len));
 	}
+	else
+	{
+		value = m_armStatus.output_reg;
+	}
+
+	uint8_t temp[255] = { 0, };
+	size_t len = 0;
+	sprintf_s((char*)temp, sizeof(temp), "cc_rcv_out=%d", value);
+	len = strnlen_s((char*)temp, 255);
+
+	string  strTmp((char*)&temp[0], len);
+	temp[255 - 1] = '\0';
+	temp[len++ % 255] = 0xff;
+	temp[len++ % 255] = 0xff;
+	temp[len++ % 255] = 0xff;
+
+	if (m_hCommWnd != nullptr)
+	{
+		if (m_lastLog[DEF_MCU_TO_OP_OUT_REG] != strTmp)
+		{
+			m_lastLog[DEF_MCU_TO_OP_OUT_REG] = strTmp;
+			strTmp.push_back('\0');
+			uint32_t pop_addr = m_log->PutLog_info("[MCU -> LCD] : %s", strTmp.c_str());
+			::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
+		}
+	}
+
+	m_ComPort->WriteByte((BYTE*)&temp[0], (UINT)(len));
 }
 
 void nextionCommLcd::sendLog()
@@ -201,34 +210,18 @@ void nextionCommLcd::sendLog()
 	uint8_t temp[255] = { 0, };
 	size_t len = 0;
 
-	while (m_log->Available())
+	while (m_log->Available(LOG_ERROR_LEVEL))
 	{
 		sprintf_s((char*)temp, sizeof(temp), "cc_log_index_curr=%d", (++m_logCursor % DEF_NEXTION_LOG_LIST_MAX));
 		len = strnlen_s((char*)temp, 255);
 		temp[255 - 1] = '\0';
-		if (len < 255) {
-			temp[len++ % 255] = 0xff;
-			temp[len++ % 255] = 0xff;
-			temp[len++ % 255] = 0xff;
-			//temp[len++ % 255] = 0;
-		}
+		temp[len++ % 255] = 0xff;
+		temp[len++ % 255] = 0xff;
+		temp[len++ % 255] = 0xff;
 
-		/*
-		if (m_hCommWnd != nullptr)
-		{
-			string  strTmp = (char*)temp;
-			if (m_lastLog != strTmp)
-			{
-				m_lastLog = (char*)temp;
-				uint32_t pop_addr = m_log->PutLog("[MCU -> LCD] : %s", temp);
-				::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
-			}
-		}
-		*/
-
-		//63 63 5F 6C 6F 67 5F 69 6E 64 65 78 5F 63 75 72 72 3D 31 ff ff ff
 		m_ComPort->WriteByte((BYTE*)&temp[0], (UINT)(len));
 
+		// intervel
 		Sleep(50);
 
 		memset(&temp[0], 0, 255);
@@ -242,26 +235,9 @@ void nextionCommLcd::sendLog()
 		temp[len++ % 255] = 0xff;
 		temp[len++ % 255] = 0xff;
 
-		/*
-		if (m_hCommWnd != nullptr)
-		{
-			string  strTmp = (char*)temp;
-			if (m_lastLog != strTmp)
-			{
-				m_lastLog = (char*)temp;
-				uint32_t pop_addr = m_log->PutLog("[MCU -> LCD] : %s", temp);
-				::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
-			}
-		}
-		*/
-		//vLogTemp.txt="Test"
-		//76 4C 6F 67 54 65 6D 70 2E 74 78 74 3D 22 54 65 73 74 22 ff ff ff
 		m_ComPort->WriteByte((BYTE*)&temp[0], (UINT)(len));
 
-
 	}
-
-
 
 }
 
@@ -495,17 +471,7 @@ int nextionCommLcd::ReceiveData()
 
 	if (ret == true)
 	{
-		//string rec_text;
-		//TCHAR rec_buff[80] = { 0, };
 		char char_temp[80] = { 0, };
-		//sprintf_s()
-		/*sprintf_s(char_temp, sizeof(char_temp), "Packet :%02X %02X %02X %02X %02X %02X"
-			, m_NextionComm.rx_packet.buffer[0]
-			, m_NextionComm.rx_packet.buffer[1]
-			, m_NextionComm.rx_packet.buffer[2]
-			, m_NextionComm.rx_packet.buffer[3]
-			, m_NextionComm.rx_packet.buffer[4]
-			, m_NextionComm.rx_packet.buffer[5]);*/
 
 		for (int i = 0; i < packet_size; i++)
 		{
@@ -543,7 +509,7 @@ int nextionCommLcd::ReceiveData()
 
 		if (m_hCommWnd != nullptr)
 		{
-			uint32_t pop_addr = m_log->PutLog("[LCD -> MCD] : %s", char_temp);
+			uint32_t pop_addr = m_log->PutLog_info("[LCD -> MCD] : %s", char_temp);
 			::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
 		}
 
@@ -608,4 +574,39 @@ void nextionCommLcd::ThreadStop()
 	m_hThread = nullptr;
 	m_idThread = 0;
 	TRACE(_T("Thread Stop\n"));
+}
+
+int nextionCommLcd::GetLCDPageNo()
+{
+	return static_cast<int>(m_NextionComm.rx_packet.page_no);
+}
+
+void nextionCommLcd::SetOutputReg(uint16_t value)
+{
+	m_armStatus.output_reg = value;
+}
+
+void nextionCommLcd::ChangeLCDPage(int page_no)
+{
+	if (page_no > DEF_NEX_PAGE_LOG && page_no < DEF_NEX_PAGE_INIT)
+		return;
+
+	uint8_t temp[255] = { 0, };
+	size_t len = 0;
+	sprintf_s((char*)temp, sizeof(temp), "page %d", page_no);
+	len = strnlen_s((char*)temp, 255);
+	//vector<char> buffer(len);
+	string  strTmp((char*)&temp[0], len);
+	temp[255 - 1] = '\0';
+	temp[len++ % 255] = 0xff;
+	temp[len++ % 255] = 0xff;
+	temp[len++ % 255] = 0xff;
+
+	if (m_hCommWnd != nullptr)
+	{
+		strTmp.push_back('\0');
+		uint32_t pop_addr = m_log->PutLog_info("[MCU -> LCD] : %s", strTmp.c_str());
+		::PostMessage(m_hCommWnd, WM_NEXTION_LCD_MAIN_DLG_MESSAGE, 0, pop_addr);
+	}
+	m_ComPort->WriteByte((BYTE*)&temp[0], (UINT)(len));
 }

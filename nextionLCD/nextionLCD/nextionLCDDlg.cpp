@@ -77,6 +77,7 @@ CnextionLCDDlg::CnextionLCDDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_pLcd = nullptr;
 	m_TimerID = 0;
+	m_isAutoReady = false;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -106,6 +107,46 @@ void CnextionLCDDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LED_8, m_led[i++]);
 
 	DDX_Control(pDX, IDC_LIST_RCV_LOG, m_recvList);
+	DDX_Control(pDX, IDC_BTN_START, m_btnStart);
+	DDX_Control(pDX, IDC_BTN_STOP, m_btnStop);
+	DDX_Control(pDX, IDC_BTN_RESET, m_btnReset);
+
+	i = 0;
+	DDX_Control(pDX, IDC_ST_BIT0, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT1, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT2, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT3, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT4, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT5, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT6, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT7, m_bitState[i++]);
+
+	DDX_Control(pDX, IDC_ST_BIT8, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT9, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT10, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT11, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT12, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT13, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT14, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT15, m_bitState[i++]);
+
+	DDX_Control(pDX, IDC_ST_BIT16, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT17, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT18, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT19, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT20, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT21, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT22, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT23, m_bitState[i++]);
+
+	DDX_Control(pDX, IDC_ST_BIT24, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT25, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT26, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT27, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT28, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT29, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT30, m_bitState[i++]);
+	DDX_Control(pDX, IDC_ST_BIT31, m_bitState[i++]);
 }
 
 BEGIN_MESSAGE_MAP(CnextionLCDDlg, CDialogEx)
@@ -116,6 +157,9 @@ BEGIN_MESSAGE_MAP(CnextionLCDDlg, CDialogEx)
 	ON_WM_SHOWWINDOW()
 	ON_MESSAGE(WM_NEXTION_LCD_MAIN_DLG_MESSAGE, &CnextionLCDDlg::OnUpdateCommLogList)
 	ON_LBN_DBLCLK(IDC_LIST_RCV_LOG, &CnextionLCDDlg::OnLbnDblclkListRcvLog)
+	ON_BN_CLICKED(IDC_BTN_START, &CnextionLCDDlg::OnBnClickedBtnStart)
+	ON_BN_CLICKED(IDC_BTN_STOP, &CnextionLCDDlg::OnBnClickedBtnStop)
+	ON_BN_CLICKED(IDC_BTN_RESET, &CnextionLCDDlg::OnBnClickedBtnReset)
 END_MESSAGE_MAP()
 
 
@@ -141,6 +185,8 @@ BOOL CnextionLCDDlg::OnInitDialog()
 	m_pLcd->m_hCommWnd = this-> GetSafeHwnd();
 
 	m_pLcd->ThreadRun();
+
+	AutoReady(false);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -220,6 +266,9 @@ void CnextionLCDDlg::OnBnClickedBtnConnect()
 			m_pLcd->m_NextionComm.is_init = true;
 			m_pLcd->m_IsPortOpen = TRUE;
 			GetDlgItem(IDC_BTN_CONNECT)->SetWindowText(_T("CLOSE"));
+
+
+			m_pLcd->ChangeLCDPage(DEF_NEX_PAGE_INIT);
 		}
 
 	}
@@ -241,7 +290,55 @@ uint16_t CnextionLCDDlg::GetInputReg()
 			| m_sensor[6].GetCheck() << 9
 			| m_sensor[7].GetCheck() << 8;
 
-	m_pLcd->m_armStatus.input_reg = input_reg;
+	m_pLcd->m_armStatus.input_reg = input_reg;	
+		
+	CString page_name;
+	switch (m_pLcd->GetLCDPageNo())
+	{
+	case DEF_NEX_PAGE_INIT: 
+	{
+		page_name = L"Page Initial";	
+	}
+	break;
+	case DEF_NEX_PAGE_MAIN:	
+	{
+		page_name = L"Page Main";
+		if (m_isAutoReady)
+		{
+			m_isAutoReady = false;
+			AutoReady(true);
+		}
+	}
+	break;
+	case DEF_NEX_PAGE_MANUAL:
+	{
+		page_name = L"Page Manual"; 
+	}
+	break;
+	case DEF_NEX_PAGE_TEACH:	
+	{
+		page_name = L"Page Teaching"; 
+	}
+	break;
+	case DEF_NEX_PAGE_IO:
+	{
+		page_name = L"Page IO Table"; 
+	}
+	break;
+	case DEF_NEX_PAGE_DATA:
+	{
+		page_name = L"Page Data";
+	}
+	break;
+	case DEF_NEX_PAGE_LOG:	
+	{
+		page_name = L"Page Log";
+	}
+	break;
+	default:
+		break;
+	}
+	SetDlgItemText(IDC_STAT_PAGE_NO, page_name);
 
 	return input_reg;
 }
@@ -268,7 +365,9 @@ void CnextionLCDDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	if (m_pLcd->m_IsPortOpen)
-	{
+	{	
+		if (m_pLcd->GetLCDPageNo() == DEF_NEX_PAGE_INIT)
+			m_pLcd->ChangeLCDPage(DEF_NEX_PAGE_IO);
 		GetInputReg();
 		SetOutputReg();
 	}
@@ -295,6 +394,7 @@ void CnextionLCDDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 			m_TimerID = 0;			
 		}
 	}
+	
 }
 
 
@@ -314,9 +414,50 @@ afx_msg LRESULT CnextionLCDDlg::OnUpdateCommLogList(WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
+void CnextionLCDDlg::AutoReady(bool on_off)
+{
+	if (on_off)
+	{
+		CButton* pBtn = (CButton*)GetDlgItem(IDC_BTN_START);
+		pBtn->EnableWindow(TRUE);
+		pBtn = (CButton*)GetDlgItem(IDC_BTN_STOP);
+		pBtn->EnableWindow(TRUE);
+		pBtn = (CButton*)GetDlgItem(IDC_BTN_RESET);
+		pBtn->EnableWindow(TRUE);
+		return;
+	}
+	//m_btnStart.
+
+	CButton* pBtn = (CButton*)GetDlgItem(IDC_BTN_START);
+	pBtn->EnableWindow(FALSE);
+	pBtn = (CButton*)GetDlgItem(IDC_BTN_STOP);
+	pBtn->EnableWindow(FALSE);
+	pBtn = (CButton*)GetDlgItem(IDC_BTN_RESET);
+	pBtn->EnableWindow(FALSE);
+
+}
+
 
 void CnextionLCDDlg::OnLbnDblclkListRcvLog()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_recvList.ResetContent();
+}
+
+
+void CnextionLCDDlg::OnBnClickedBtnStart()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CnextionLCDDlg::OnBnClickedBtnStop()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CnextionLCDDlg::OnBnClickedBtnReset()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }

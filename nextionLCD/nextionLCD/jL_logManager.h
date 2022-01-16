@@ -7,6 +7,11 @@
 #define LOGMANAGE_BUFF_LIST_MAX 256  
 #define LOGMANAGE_TXT_LENGTH__MAX 256
 
+#define LOG_INFOR_LEVEL					0
+#define LOG_WARNING_LEVEL				1
+#define LOG_ERROR_LEVEL					2
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -15,6 +20,13 @@ using namespace std;
 
 class jL_logManager
 {
+	enum class level {
+		info,
+		err,
+		warning,
+		_max
+	};
+
 	template <typename T>
 	class _Que
 	{
@@ -152,14 +164,14 @@ class jL_logManager
 public:
 	jL_logManager() :m_Index(0)	, m_isInit(false), m_pBuff(nullptr){
 		logInit();
-		m_QueList = new _Que<string>;
+		m_QueList = new _Que<string>[static_cast<int>(level::_max)];
 		m_isInit = true;
 	}
 
 	~jL_logManager()	{
 		if (m_QueList != nullptr)
 		{
-			delete m_QueList;
+			delete[] m_QueList;
 		}
 		logInit();
 	}
@@ -169,23 +181,22 @@ private:
 		m_pBuff = nullptr;
 		m_Index = 0;
 		m_isInit = false;
-		m_QueList = nullptr;
+		m_QueList = { nullptr ,};
 	}
+
 	inline bool logBufPrintf(char* p_data, uint32_t length) {
 		return 0;
 	}
 
 public:
-	inline uint32_t PutLog(const char* fmt, ...) {
+	inline uint32_t PutLog_info(const char* fmt, ...) {
 		//TODO: 들어온 로그를 표시해야 할 때 함수
-
 		uint32_t ret = 0;
 		if (m_isInit != true) return ret;
 
 		m_Mutex.lock();
 		va_list args;
 		va_start(args, fmt);
-
 #if 0
 		va_list copy;
 		va_copy(copy, args);
@@ -201,7 +212,6 @@ public:
 #endif
 
 #if 1
-		va_start(args, fmt);		
 		int len = vsnprintf(nullptr, 0, fmt, args);
 		if (len < 0) {
 			va_end(args);
@@ -214,7 +224,7 @@ public:
 			vector<char> buffer(vec_len);
 			len = vsnprintf(&buffer[0], buffer.size(), fmt, args);
 			string result = std::string(&buffer[0], len);
-			ret = m_QueList->Put(result);
+			ret = m_QueList[static_cast<int>(level::info)].Put(result);
 		}
 #endif
 
@@ -224,16 +234,151 @@ public:
 		return ret;
 	}
 
-	inline string GetLog() {
-		return m_QueList->Get();
+	inline uint32_t PutLog_warning(const char* fmt, ...) {
+		//TODO: 들어온 로그를 표시해야 할 때 함수
+		uint32_t ret = 0;
+		if (m_isInit != true) return ret;
+
+		m_Mutex.lock();
+		va_list args;
+		va_start(args, fmt);
+
+		int len = vsnprintf(nullptr, 0, fmt, args);
+		if (len < 0) {
+			va_end(args);
+			m_Mutex.unlock();
+			return ret;
+		}
+		else if (len > 0)
+		{
+			uint32_t vec_len = len + 1;
+			vector<char> buffer(vec_len);
+			len = vsnprintf(&buffer[0], buffer.size(), fmt, args);
+			string result = std::string(&buffer[0], len);
+			ret = m_QueList[static_cast<int>(level::warning)].Put(result);
+		}
+
+		va_end(args);
+		m_Mutex.unlock();
+
+		return ret;
 	}
 
-	inline string PopLog(uint32_t addr) {
-		return m_QueList->Pop(addr);
+	inline uint32_t PutLog_error(const char* fmt, ...) {
+		//TODO: 들어온 로그를 표시해야 할 때 함수
+		uint32_t ret = 0;
+		if (m_isInit != true) return ret;
+
+		m_Mutex.lock();
+		va_list args;
+		va_start(args, fmt);
+
+		int len = vsnprintf(nullptr, 0, fmt, args);
+		if (len < 0) {
+			va_end(args);
+			m_Mutex.unlock();
+			return ret;
+		}
+		else if (len > 0)
+		{
+			uint32_t vec_len = len + 1;
+			vector<char> buffer(vec_len);
+			len = vsnprintf(&buffer[0], buffer.size(), fmt, args);
+			string result = std::string(&buffer[0], len);
+			ret = m_QueList[static_cast<int>(level::err)].Put(result);
+		}
+
+		va_end(args);
+		m_Mutex.unlock();
+
+		return ret;
 	}
 
-	inline uint32_t Available() {
-		return m_QueList->Available();
+
+	/// <summary>
+	/// 로그를 출력하다
+	/// </summary>
+	/// <param name="level">0:info, 1:warning, 2:error</param>
+	/// <returns></returns>
+	inline string GetLog(int level = static_cast<int>(level::info)) {
+		string ret;
+		switch (level)
+		{
+		case static_cast<int>(level::err):
+		{
+			ret = m_QueList[static_cast<int>(level::err)].Get();
+		}
+		break;
+		case static_cast<int>(level::warning):
+		{
+			ret = m_QueList[static_cast<int>(level::warning)].Get();
+		}
+		break;
+		default:
+		{
+			ret = m_QueList[static_cast<int>(level::info)].Get();
+		}
+		break;
+		}
+		return ret;
+	}
+
+	/// <summary>
+	/// addr 위치한 level 로그를 출력한다. 
+	/// </summary>
+	/// <param name="addr">주소</param>
+	/// <param name="level">0:info, 1:warning, 2:error</param>
+	/// <returns></returns>
+	inline string PopLog(uint32_t addr, int level = static_cast<int>(level::info)) {
+		string ret;
+		switch (level)
+		{
+		case static_cast<int>(level::err):
+		{
+			ret = m_QueList[static_cast<int>(level::err)].Pop(addr);
+		}
+		break;
+		case static_cast<int>(level::warning):
+		{
+			ret = m_QueList[static_cast<int>(level::warning)].Pop(addr);
+		}
+		break;
+		default:
+		{
+			ret = m_QueList[static_cast<int>(level::info)].Pop(addr);
+		}
+		break;
+		}
+		return ret;
+	}
+
+
+	/// <summary>
+	/// 출력한 log가 있는다면 갯수 출력
+	/// </summary>
+	/// <param name="level">0:info, 1:warning, 2:error</param>
+	/// <returns></returns>
+	inline uint32_t Available(int level = static_cast<int>(level::info)) {
+		uint32_t ret;
+		switch (level)
+		{
+		case static_cast<int>(level::err):
+		{
+			ret = m_QueList[static_cast<int>(level::err)].Available();
+		}
+		break;
+		case static_cast<int>(level::warning):
+		{
+			ret = m_QueList[static_cast<int>(level::warning)].Available();
+		}
+		break;
+		default:
+		{
+			ret = m_QueList[static_cast<int>(level::info)].Available();
+		}
+		break;
+		}
+		return ret;
 	}
 
 };
