@@ -35,7 +35,10 @@ int jL_fastechMotor::PortOpen(CString portname, DWORD baudrate, WORD port_no, HW
 	if (m_pComm->OpenPort(portname, baudrate, port_no, hwnd) == retSuccess)
 	{
 		m_pComm->ReadyPort();
-	//	m_pComm->ThreadRun();
+		m_pComm->ThreadRun();
+		
+		// Callbac function attach
+		m_pComm->SetCallback(this, WarpFunc);
 	}
 	return retSuccess;
 }
@@ -61,7 +64,25 @@ int jL_fastechMotor::MotorOnOff(bool on_off)
 	return m_pComm->SendCmd(jL_fastechComm::fastech_cmdList::SERVO_ENABLE, &data, 1);
 }
 
+uint32_t jL_fastechMotor::GetAxisStatus(uint8_t id)
+{	
+	return m_pComm->SendCmd(jL_fastechComm::fastech_cmdList::GET_AXIS_STATUS);}
+
 jL_fastechMotor::motor_state* jL_fastechMotor::GetMotorState()
 {
 	return &m_motorState;
 }
+
+int jL_fastechMotor::UpdateReceiveData(uint8_t* p_data, uint16_t length)
+{
+	m_motorState.axis_status = 0;
+	uint8_t tmp = 0;
+	for (int i = 0; i < length; i++)
+	{
+		tmp = p_data[i];
+		m_motorState.axis_status |= (tmp << 8 * i);
+	}
+	
+	return 0;
+}
+

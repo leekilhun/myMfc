@@ -110,6 +110,11 @@
 
 class jL_fastechComm : public jL_CommSerial
 {
+public:
+	typedef int (*CallbackDataUpdate)(void* obj, uint8_t* data, uint16_t length); // 콜백 타입 정의
+	CallbackDataUpdate m_callbackUpdate;
+	void*  m_fastechMotorObject;
+private:
 	class _Register
 	{
 	public:
@@ -299,6 +304,7 @@ public:
 		MOVE_ALL_ORG_STOP,
 		MOVE_ALL_ABS_POS,
 		MOVE_ALL_REL_POS,
+		GET_AXIS_STATUS,
 		_max,
 	};
 
@@ -393,7 +399,7 @@ public:
 	void UpdateReg();
 	int SetMotorId(uint8_t id);
 	int SendCmd(uint32_t cmd_index);
-	int SendCmd(fastech_cmdList cmdenum, uint8_t* data = nullptr, uint8_t length = 0);
+	uint32_t SendCmd(fastech_cmdList cmdenum, uint8_t* data = nullptr, uint8_t length = 0);
 	DWORD ThreadRun();
 	int Terminate();
 	void AddStringCmdList(CComboBox* combobox);
@@ -401,9 +407,13 @@ public:
 	inline static int WarpFunc(void* obj) {
 		jL_fastechComm* self = (jL_fastechComm*)(obj);
 		return self->ParsingPacket();
+	} 
+
+	inline void SetCallback(void* obj, CallbackDataUpdate cb)
+	{
+		m_callbackUpdate = cb;
+		m_fastechMotorObject = obj;
 	}
-
-
 
 
 };

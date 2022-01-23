@@ -78,6 +78,8 @@
 #define DEF_FASTECH_COMM_TYPE_MOVE_ALL_ORG_STOP       0x3D
 #define DEF_FASTECH_COMM_TYPE_MOVE_ALL_ABS_POS        0x3E
 #define DEF_FASTECH_COMM_TYPE_MOVE_ALL_REL_POS        0x3F
+#define DEF_FASTECH_COMM_TYPE_GET_AXIS_STATUS         0x40
+
 #endif
 
 #define CMD_STX1                    0xAA
@@ -91,7 +93,8 @@
 #define DEF_FASTECH_PC_TO_MOTOR_DATA        1
 
 
-jL_fastechComm::jL_fastechComm()
+jL_fastechComm::jL_fastechComm():m_callbackUpdate(nullptr)
+, m_fastechMotorObject(nullptr)
 {
 	m_CmdState = cmd_state::wait_stx;
 	m_Checksum = 0xFF;
@@ -206,6 +209,9 @@ jL_fastechComm::jL_fastechComm()
 	cmd.cmd = DEF_FASTECH_COMM_TYPE_MOVE_ALL_REL_POS;
 	cmd.name = L"MOVE_ALL_REL_POS";
 	m_CmdList->InsertCmd(cmd);
+	cmd.cmd = DEF_FASTECH_COMM_TYPE_GET_AXIS_STATUS;
+	cmd.name = L"GET_AXIS_STATUS";
+	m_CmdList->InsertCmd(cmd);
 
 
 	m_log = new jL_logManager;
@@ -240,17 +246,19 @@ UINT jL_fastechComm::commThread(LPVOID pParam)
 {
 	jL_fastechComm* pThis = (jL_fastechComm*)pParam;
 
-	BYTE request_state[8] = { 0xAA, 0xCC, 0x00, 0x01, 0xC0, 0x70, 0xAA, 0xEE };
+	//BYTE request_state[8] = { 0xAA, 0xCC, 0x00, 0x01, 0xC0, 0x70, 0xAA, 0xEE };
 	pThis->m_IsWiatResponse = true;
 	TRACE("Fastech Comm Thread start\n");
 	pThis->m_FastechComm.pre_time = util::millis();
 	while (pThis->m_bThreadLife)
 	{
 		bool heartbeat = util::millis() - pThis->m_FastechComm.pre_time > 1000;
-		if (pThis->m_IsWiatResponse || heartbeat)
+		if (pThis->m_IsWiatResponse /*|| heartbeat*/)
 		{
 			pThis->m_IsWiatResponse = false;
-			pThis->WriteByte(&request_state[0], 8);
+			pThis->m_FastechComm.pre_time = util::millis();
+
+			pThis->SendCmd(jL_fastechComm::fastech_cmdList::GET_AXIS_STATUS);
 			Sleep(20);
 			//pThis->UpdateReg();
 		}
@@ -295,21 +303,21 @@ void jL_fastechComm::doTypeComm(uint8_t type)
 	string  str_asc((char*)&char_asc[0], len);
 	trans::CharToLPTSTR((LPSTR)&char_asc[0], &rec_asc[0], FASTECH_CMD_MAX_DATA_LENGTH);
 
-
-	switch (m_FastechComm.rx_packet.type)
+	//TODO:: 
+	fastech_cmdList cmd_type = m_CmdList->GetIndex(m_FastechComm.rx_packet.type);
+	switch (cmd_type)
 	{
-	case DEF_FASTECH_COMM_TYPE_GET_SLAVE_INFO: // 
+	case fastech_cmdList::SERVO_ENABLE: {	}	break;
+	case fastech_cmdList::ALARAM_RESET: {	}	break;
+	case fastech_cmdList::GET_AXIS_STATUS: // 
 	{
+		if (m_callbackUpdate != nullptr)
+		{
+			(*m_callbackUpdate)(m_fastechMotorObject, m_FastechComm.rx_packet.data, m_FastechComm.rx_packet.length);
+		}
 	}
 	break;
-	case 0xff: // 
-	{
-		/*m_pRegisterIO->SetRegisterIn(m_FastechComm.rx_packet.data[0], 0);
-		m_pRegisterIO->SetRegisterIn(m_FastechComm.rx_packet.data[1], 1);
-		m_pRegisterIO->SetRegisterIn(m_FastechComm.rx_packet.data[2], 2);
-		m_pRegisterIO->SetRegisterIn(m_FastechComm.rx_packet.data[3], 3);*/
-	}
-	break;
+	default:	break;
 	}
 
 
@@ -327,6 +335,7 @@ void jL_fastechComm::doTypeComm(uint8_t type)
 		}
 	}
 
+	m_IsWiatResponse = true;
 
 }
 
@@ -347,8 +356,6 @@ int jL_fastechComm::ParsingPacket()
 	length = m_pQueueRead->GetSize();
 	if (length == 0)
 		goto exit_parsing;
-
-	m_IsWiatResponse = true;
 
 	bool ret = false;
 	//int packet_size = 0;
@@ -432,6 +439,11 @@ int jL_fastechComm::ParsingPacket()
 				m_FastechComm.rx_packet.length = 0;
 			}
 			break;
+			case fastech_cmdList::GET_AXIS_STATUS: // 
+			{
+				m_FastechComm.rx_packet.length = 4;
+			}
+			break;
 			default:
 			{
 				m_FastechComm.rx_packet.length = FASTECH_CMD_MAX_DATA_LENGTH;
@@ -487,7 +499,7 @@ int jL_fastechComm::ParsingPacket()
 					delete m_FastechComm.rx_packet.data;
 					m_FastechComm.rx_packet.data = nullptr;
 				}
-				m_FastechComm.rx_packet.data = new uint8_t[FASTECH_CMD_MAX_DATA_LENGTH]{};
+				m_FastechComm.rx_packet.data = new uint8_t[m_FastechComm.rx_packet.length]{};
 				m_FastechComm.index = 0;
 				m_CmdState = cmd_state::wait_data;
 			}
@@ -525,7 +537,6 @@ int jL_fastechComm::ParsingPacket()
 			}
 
 			// 입력할 데이터 넣기
-
 			if (data == STUFFING_BYTE)
 			{
 				m_FastechComm.rx_packet.buffer[m_FastechComm.packet_size++] = data;
@@ -544,6 +555,12 @@ int jL_fastechComm::ParsingPacket()
 				m_FastechComm.rx_packet.buffer[m_FastechComm.packet_size++] = data;
 
 				util::crc16_put(&m_FastechComm.rx_packet.check_sum, data);				
+			}
+
+			if (m_FastechComm.index == m_FastechComm.rx_packet.length)
+			{
+				m_FastechComm.wait_next = false;
+				m_CmdState = cmd_state::wait_checksum;
 			}
 
 		}
@@ -720,7 +737,7 @@ int jL_fastechComm::SendCmd(uint32_t cmd_index)
 	return 0;
 }
 
-int jL_fastechComm::SendCmd(fastech_cmdList cmdenum, uint8_t* data, uint8_t length)
+uint32_t jL_fastechComm::SendCmd(fastech_cmdList cmdenum, uint8_t* data, uint8_t length)
 {
 	ResetData();
 
@@ -743,12 +760,14 @@ int jL_fastechComm::SendCmd(fastech_cmdList cmdenum, uint8_t* data, uint8_t leng
 	packet[index] = cmd.cmd; // cmd
 	util::crc16_put(&crc, packet[index++]);
 
+	uint32_t ret_data = 0;
 	if (length > 0)
 	{
 		for (size_t i = 0; i < length; i++)
 		{
 			packet[index] = data[i]; // data
 			util::crc16_put(&crc, packet[index++]);
+			ret_data = data[i] << (i * 8);
 		}
 	}
 	
@@ -786,8 +805,7 @@ int jL_fastechComm::SendCmd(fastech_cmdList cmdenum, uint8_t* data, uint8_t leng
 		}
 	}
 
-
-	return 0;
+	return ret_data;
 }
 
 DWORD jL_fastechComm::ThreadRun()

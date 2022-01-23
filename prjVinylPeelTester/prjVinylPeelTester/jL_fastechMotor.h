@@ -42,7 +42,14 @@ public:
 	void PortClose();
 	void SendCommand(uint32_t cmd_index = 0, uint8_t id = 0);
 	int MotorOnOff(bool on_off);
+	uint32_t GetAxisStatus(uint8_t id = 0);
 	motor_state* GetMotorState();
+	int UpdateReceiveData(uint8_t* p_data, uint16_t length);
+
+	inline static int WarpFunc(void* obj, uint8_t* p_data, uint16_t len) {
+		jL_fastechMotor* self = (jL_fastechMotor*)(obj);
+		return self->UpdateReceiveData(p_data, len);
+	}
 
 };
 
