@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{c4dfb172-5f32-44d8-b0a9-ee78a530a1d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\CGridListCtrlEx">
+      <UniqueIdentifier>{f4e0fc0c-44bd-4415-9b6e-b24f90c42d4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\CGridListCtrlEx\src">
+      <UniqueIdentifier>{02ce9ccf-1c6b-4624-a0dc-f86cbbd23ab0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\CGridListCtrlEx\inc">
+      <UniqueIdentifier>{5e2410e2-47f5-4833-9288-7679cb8ecb78}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fastechModule.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="fastechModuleDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tab_main.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tab_io.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="popMsg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTrait.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitCombo.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitDateTime.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitEdit.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitHyperLink.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitImage.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitMultilineEdit.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitText.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridColumnTraitVisitor.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridListCtrlEx.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridListCtrlGroups.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridRowTrait.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridRowTraitText.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridRowTraitVisitor.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\CGridRowTraitXP.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CGridListCtrlEx\ViewConfigSection.h">
+      <Filter>lib\CGridListCtrlEx\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="CListCtrl_LogList.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tab_test.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_fastechIO.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_inforObj.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_system.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_utility.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_virtualRS.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="performanceTimer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtil.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ICommon.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IIO.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_CommSerial.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="def_inforObj.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_ioManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="fastechModule.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="fastechModuleDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tab_main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tab_io.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="popMsg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitCombo.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitDateTime.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitEdit.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitHyperLink.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitImage.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitMultilineEdit.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridColumnTraitText.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridListCtrlEx.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridListCtrlGroups.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridRowTraitText.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\CGridRowTraitXP.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CGridListCtrlEx\ViewConfigSection.cpp">
+      <Filter>lib\CGridListCtrlEx\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tab_test.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_CommSerial.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_fastechIO.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_inforObj.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_ioManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_system.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="performanceTimer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtil.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="fastechModule.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\fastechModule.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\fastechModule.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\bitmap2.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

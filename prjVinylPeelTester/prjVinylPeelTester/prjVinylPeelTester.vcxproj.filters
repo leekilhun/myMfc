@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{ce588c58-5ab6-45d9-9716-d1467a5edd6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="module">
+      <UniqueIdentifier>{ae2c6753-0f7a-4a5a-af29-ff8cd5e13eb5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="prjVinylPeelTester.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="prjVinylPeelTesterDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="tabMain.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_system.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\def_inforObj.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\FileUtil.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ICommon.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\IIO.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_CommSerial.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_fastechComm.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_inforObj.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_utility.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_virtualRS.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Log.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\performanceTimer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\qBuffer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="jL_fastechMotor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\IAxis.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="tabMotor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\def_userPostMasg.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_logManager.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="popDlg_axisStatus.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="prjVinylPeelTester.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="prjVinylPeelTesterDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tabMain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_system.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\FileUtil.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\jL_CommSerial.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\jL_fastechComm.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\jL_inforObj.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Log.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\performanceTimer.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="jL_fastechMotor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tabMotor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\jL_logManager.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="popDlg_axisStatus.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="prjVinylPeelTester.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\prjVinylPeelTester.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\prjVinylPeelTester.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\bitmapTabMain.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
