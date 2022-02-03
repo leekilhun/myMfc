@@ -19,6 +19,40 @@ BEGIN_MESSAGE_MAP(CprjVinylPeelTesterApp, CWinApp)
 END_MESSAGE_MAP()
 
 
+void test_timer()
+{
+
+	long sum = 0;
+	timer::_us timer;
+	timer.Start();
+	chrono::system_clock::time_point StartTime = chrono::system_clock::now();
+	for (int i = 0; i < 10000000; i++) {
+		sum += i;
+	}
+
+	chrono::system_clock::time_point EndTime = chrono::system_clock::now();
+	uint64_t ret = timer.Elaps();
+
+	chrono::duration<double> DefaultSec = EndTime - StartTime;
+	chrono::nanoseconds nano = EndTime - StartTime;
+	chrono::microseconds micro = chrono::duration_cast<chrono::microseconds>(EndTime - StartTime);
+	chrono::milliseconds mill = chrono::duration_cast<chrono::milliseconds>(EndTime - StartTime);
+	chrono::seconds sec = chrono::duration_cast<chrono::seconds>(EndTime - StartTime);
+	chrono::minutes min = chrono::duration_cast<chrono::minutes>(EndTime - StartTime);
+	chrono::hours hour = chrono::duration_cast<chrono::hours>(EndTime - StartTime);
+
+	double result = static_cast<double>(DefaultSec.count()) ;
+	result = static_cast<double>(nano.count()) ;
+	result = static_cast<double>(micro.count()) ;
+	result = static_cast<double>(mill.count()) ;
+	result = static_cast<double>(sec.count()) ;
+	result = static_cast<double>(min.count()) ;
+	result = static_cast<double>(hour.count()) ;
+
+
+}
+
+
 // CprjVinylPeelTesterApp 생성
 
 CprjVinylPeelTesterApp::CprjVinylPeelTesterApp()
@@ -45,6 +79,25 @@ BOOL CprjVinylPeelTesterApp::InitInstance()
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
 		return FALSE;
 	}
+
+	//Test
+
+	//test_timer();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	m_system = new jL_system;

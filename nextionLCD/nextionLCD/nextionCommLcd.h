@@ -116,6 +116,10 @@ private:
 	void updateOutReg();
 	void sendLog();
 
+	uint32_t crc_update(uint32_t crc_in, int incr);
+	void crc_update(uint32_t* crc_in, uint8_t data);
+	uint16_t crc16(uint8_t data);
+
 public:
 	int ReceiveData();
 	int OpenComPort(CString portname, DWORD baudrate = CBR_9600, WORD port_no = 0);
@@ -124,7 +128,7 @@ public:
 	void ThreadRun();
 	void ThreadStop();
 
-	int GetLCDPageNo();
+		int GetLCDPageNo();
 	void SetOutputReg(uint16_t value);
 	void ChangeLCDPage(int page_no);
 

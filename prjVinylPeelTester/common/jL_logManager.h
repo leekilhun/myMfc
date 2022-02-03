@@ -4,7 +4,7 @@
 #include <vector>
 #include "jL_utility.h"
 
-#define LOGMANAGE_BUFF_LIST_MAX 256  
+#define LOGMANAGE_BUFF_LIST_MAX 4096  
 #define LOGMANAGE_TXT_LENGTH__MAX 256
 
 #define LOG_INFOR_LEVEL					0
@@ -66,9 +66,12 @@ class jL_logManager
 		}
 
 		inline T Get() {
-			T temp = _logList[_Tail];
-			_Tail = (_Tail + 1) % LOGMANAGE_BUFF_LIST_MAX;
-			return temp;
+			T temp;
+      if (!Available())
+        return temp;
+      temp = _logList[_Tail];
+      _Tail = (_Tail + 1) % LOGMANAGE_BUFF_LIST_MAX;
+      return temp;
 		}
 
 		inline T Pop(uint32_t addr) {

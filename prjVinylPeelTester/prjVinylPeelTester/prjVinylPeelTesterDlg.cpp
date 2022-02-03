@@ -201,3 +201,27 @@ void CprjVinylPeelTesterDlg::OnTcnSelchangeTabBody(NMHDR* pNMHDR, LRESULT* pResu
 
 
 }
+
+
+BOOL CprjVinylPeelTesterDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	// enter key 
+  if (pMsg->message == WM_KEYDOWN)
+  {
+    switch (pMsg->wParam)
+    {
+    case VK_ESCAPE:
+    case VK_RETURN:
+    {
+      return true;
+    }
+    break;
+    default:
+      break;
+    }
+  }
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}

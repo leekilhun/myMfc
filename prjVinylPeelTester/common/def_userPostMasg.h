@@ -1,3 +1,5 @@
 
 #define WM_FASTECH_MOTOR_SERIAL_COMM_MESSAGE							(WM_USER+2)		//
 #define WM_NEXTION_LCD_MAIN_DLG_MESSAGE										(WM_USER+3)		//
+#define WM_FASTECH_MOTOR_CMD_MESSAGE							        (WM_USER+4)		//
+#define WM_FASTECH_MOTOR_REG_UPDATE_MESSAGE							  (WM_USER+5)		//

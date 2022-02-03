@@ -185,6 +185,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\def.h" />
     <ClInclude Include="..\common\def_inforObj.h" />
     <ClInclude Include="..\common\def_userPostMasg.h" />
     <ClInclude Include="..\common\FileUtil.h" />
@@ -195,8 +196,11 @@
     <ClInclude Include="..\common\jL_fastechComm.h" />
     <ClInclude Include="..\common\jL_inforObj.h" />
     <ClInclude Include="..\common\jL_logManager.h" />
+    <ClInclude Include="..\common\jL_Registor.h" />
+    <ClInclude Include="..\common\jL_scheduler.h" />
     <ClInclude Include="..\common\jL_utility.h" />
     <ClInclude Include="..\common\jL_virtualRS.h" />
+    <ClInclude Include="..\common\LedButton.h" />
     <ClInclude Include="..\common\Log.h" />
     <ClInclude Include="..\common\performanceTimer.h" />
     <ClInclude Include="..\common\qBuffer.h" />
@@ -218,6 +222,7 @@
     <ClCompile Include="..\common\jL_fastechComm.cpp" />
     <ClCompile Include="..\common\jL_inforObj.cpp" />
     <ClCompile Include="..\common\jL_logManager.cpp" />
+    <ClCompile Include="..\common\jL_scheduler.cpp" />
     <ClCompile Include="..\common\Log.cpp" />
     <ClCompile Include="..\common\performanceTimer.cpp" />
     <ClCompile Include="jL_fastechMotor.cpp" />
@@ -243,7 +248,9 @@
   <ItemGroup>
     <Image Include="res\bitmap1.bmp" />
     <Image Include="res\bitmapTabMain.bmp" />
+    <Image Include="res\greenButton.bmp" />
     <Image Include="res\prjVinylPeelTester.ico" />
+    <Image Include="res\redButton.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -241,6 +241,61 @@ void nextionCommLcd::sendLog()
 
 }
 
+#define CRC_POLY 0xA001
+uint32_t nextionCommLcd::crc_update(uint32_t crc_in, int incr)
+{
+	uint16_t xor = crc_in >> 15;
+	uint16_t out = crc_in << 1;
+
+	if (incr)
+	{
+		out++;
+	}
+
+	if (xor)
+	{
+		out ^= CRC_POLY;
+	}
+
+	return out;
+}
+
+void nextionCommLcd::crc_update(uint32_t* crc_in, uint8_t data)
+{
+	uint16_t crc = *crc_in;
+	uint8_t i;
+	/* Exclusive-OR the byte with the CRC */
+	crc ^= data; //*(pDataBuffer + iByte);
+
+
+	/* Loop through all 8 data bits */
+	for (i = 0; i <= 7; i++)
+	{
+		/* If the LSB is 1, shift the CRC and XOR the polynomial mask with the CRC */
+		// Note - the bit test is performed before the rotation, so can't move the << here
+		if (crc & 0x0001)
+		{
+			crc >>= 1;
+			crc ^= CRC_POLY;
+		}
+		else
+		{
+			// Just rotate it
+			crc >>= 1;
+		}
+	}
+
+	*crc_in = crc;
+}
+
+uint16_t nextionCommLcd::crc16(uint8_t data)
+{
+	
+
+
+	return uint16_t();
+}
+
 
 
 
@@ -350,7 +405,8 @@ int nextionCommLcd::ReceiveData()
 		case cmd_state::wait_page_no:
 		{
 			m_NextionComm.rx_packet.page_no = (nextionpage_t)data;
-			util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			//util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			crc_update(&m_NextionComm.rx_packet.check_sum, data);
 
 			m_NextionComm.rx_packet.buffer[packet_size++] = data;
 			m_CmdState = cmd_state::wait_type;
@@ -367,7 +423,8 @@ int nextionCommLcd::ReceiveData()
 				ret = true;
 				break;
 			}
-			util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			//util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			crc_update(&m_NextionComm.rx_packet.check_sum, data);
 			m_CmdState = cmd_state::wait_obj_id;
 		}
 		break;
@@ -385,7 +442,8 @@ int nextionCommLcd::ReceiveData()
 			m_NextionComm.rx_packet.length = data;
 			m_NextionComm.rx_packet.length &= 0x00FF;
 			m_NextionComm.rx_packet.buffer[packet_size++] = data;
-			util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			//util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			crc_update(&m_NextionComm.rx_packet.check_sum, data);
 			m_CmdState = cmd_state::wait_length_h;
 		}
 		break;
@@ -393,7 +451,8 @@ int nextionCommLcd::ReceiveData()
 		{
 			m_NextionComm.rx_packet.length |= (data << 8);
 			m_NextionComm.rx_packet.buffer[packet_size++] = data;
-			util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			//util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			crc_update(&m_NextionComm.rx_packet.check_sum, data);
 			if (m_NextionComm.rx_packet.length > 0)
 			{
 				if (m_NextionComm.rx_packet.data != nullptr)
@@ -416,7 +475,8 @@ int nextionCommLcd::ReceiveData()
 			m_NextionComm.rx_packet.data[m_NextionComm.index++] = data;
 			m_NextionComm.rx_packet.buffer[packet_size++] = data;
 
-			util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			//util::crc16_put(&m_NextionComm.rx_packet.check_sum, data);
+			crc_update(&m_NextionComm.rx_packet.check_sum, data);
 			if (m_NextionComm.index == m_NextionComm.rx_packet.length)
 			{
 				m_NextionComm.rx_packet.check_sum_recv = 0x00;

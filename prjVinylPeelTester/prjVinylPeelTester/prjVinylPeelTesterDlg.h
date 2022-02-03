@@ -42,4 +42,5 @@ public:
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnDestroy();
 	afx_msg void OnTcnSelchangeTabBody(NMHDR* pNMHDR, LRESULT* pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

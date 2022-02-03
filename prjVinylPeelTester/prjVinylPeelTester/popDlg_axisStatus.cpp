@@ -5,6 +5,11 @@
 #include "prjVinylPeelTester.h"
 #include "popDlg_axisStatus.h"
 #include "afxdialogex.h"
+#include "tabMotor.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
 
 
 #define UPDATE_TIMER__AXIS_STATE_DLG 3  // timer id
@@ -15,9 +20,9 @@ IMPLEMENT_DYNAMIC(popDlg_axisStatus, CDialogEx)
 
 popDlg_axisStatus::popDlg_axisStatus(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_POPDLG_STATUS, pParent)
-	,m_TimerID(0)
+	,m_TimerID(0),m_pParent(nullptr)
 {
-
+	m_pParent = (tabMotor*)pParent;
 }
 
 popDlg_axisStatus::~popDlg_axisStatus()
@@ -95,6 +100,11 @@ BOOL popDlg_axisStatus::OnInitDialog()
 void popDlg_axisStatus::OnDestroy()
 {
 	CDialogEx::OnDestroy();
+	if (m_TimerID != 0)
+	{
+		KillTimer(m_TimerID);
+		m_TimerID = 0;
+	}
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }
@@ -130,4 +140,40 @@ void popDlg_axisStatus::OnTimer(UINT_PTR nIDEvent)
 
 void popDlg_axisStatus::update()
 {
+	int i = 0;
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b0]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b1]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b2]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b3]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b4]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b5]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b6]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_0][reg_::b7]);
+
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b0]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b1]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b2]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b3]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b4]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b5]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b6]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_1][reg_::b7]);
+
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b0]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b1]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b2]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b3]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b4]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b5]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b6]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_2][reg_::b7]);
+
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b0]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b1]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b2]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b3]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b4]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b5]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b6]);
+	m_state[i++].SetCheck(m_pParent->m_pMotor->m_motorState.axis_status[reg_bank::_3][reg_::b7]);
 }

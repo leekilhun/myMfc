@@ -1,9 +1,154 @@
 
 #pragma once
 #include "stdint.h"
+#include <chrono>
 
-namespace thread
+using namespace std;
+
+namespace conv 
 {
+  inline int DwToInt(byte* bytes) {
+    int a = bytes[0] & 0xFF;
+    a |= ((bytes[1] << 8) & 0xFF00);
+    a |= ((bytes[2] << 16) & 0xFF0000);
+    a |= ((bytes[3] << 24) & 0xFF000000);
+
+    return a;
+  }
+
+
+
+
+}
+namespace timer
+{
+  class _us
+  {
+    chrono::system_clock::time_point start_time;
+    bool is_start;
+  public:
+    _us() :start_time({}), is_start(false)
+    {
+    }
+
+    ~_us()
+    {
+    }
+
+  private:
+  public:
+    inline void Start(){
+      start_time = chrono::system_clock::now();
+      is_start = true;
+    }
+
+    inline chrono::system_clock::time_point End() {
+      return chrono::system_clock::now();
+    }
+
+    inline void Stop() {
+      is_start = false;
+    }
+
+    inline bool IsStarted() {
+      return is_start;
+    }
+
+    inline uint64_t Elaps(bool is_reset = false) {
+      if (!is_start) //not
+        return 0; 
+      chrono::microseconds micro = chrono::duration_cast<chrono::microseconds>(End() - start_time);
+      if (is_reset)
+        Start();
+      return micro.count();
+    }
+
+    inline bool LessThan(uint32_t us) {
+      if (Elaps() < us)
+      {
+        Start();
+        return true;
+      }
+      else
+        return false;
+    }
+
+    inline bool MoreThan(uint32_t us) {
+      if (Elaps() > us)
+      {
+        Start();
+        return true;
+      }
+      else
+        return false;
+    }
+  };
+
+
+
+  class _ms
+  {
+    chrono::system_clock::time_point start_time;
+    bool is_start;
+  public:
+    _ms() :start_time({}), is_start(false)
+    {
+    }
+
+    ~_ms()
+    {
+    }
+
+  private:
+  public:
+    inline void Start() {
+      start_time = chrono::system_clock::now();
+      is_start = true;
+    }
+
+    inline chrono::system_clock::time_point End() {
+      return chrono::system_clock::now();
+    }
+
+    inline void Stop() {
+      is_start = false;
+    }
+
+    inline bool IsStarted() {
+      return is_start;
+    }
+
+    inline uint64_t Elaps(bool is_reset = false) {
+      if (!is_start) //not
+        return 0;
+      chrono::milliseconds mill = chrono::duration_cast<chrono::milliseconds>(End() - start_time);
+      if (is_reset)
+        Start();
+      return mill.count();
+    }
+
+    inline bool LessThan(uint32_t ms) {
+      if (Elaps() < ms)
+      {
+        Start();
+        return true;
+      }
+      else
+        return false;
+    }
+
+    inline bool MoreThan(uint32_t ms) {
+      if (Elaps() > ms)
+      {
+        Start();
+        return true;
+      }
+      else
+        return false;
+    }
+  };
+
+
 
 }
 
@@ -11,10 +156,6 @@ namespace thread
 
 namespace util
 {
-
-
-#if 1
-
   const unsigned short crc_table[] = 
   { 
     0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
@@ -63,6 +204,7 @@ namespace util
   }
 
 
+
   uint32_t millis(void);
 
   /// <summary>
@@ -92,7 +234,7 @@ namespace util
     QueryPerformanceCounter(&counter);
     QueryPerformanceFrequency(&freq);
 
-    ret = (double)counter.QuadPart / (double)freq.QuadPart * 1000.0;
+    ret = ((double)counter.QuadPart / (double)freq.QuadPart) * 1000.0;
 
     return (uint32_t)ret;
   }
@@ -110,12 +252,12 @@ namespace util
     QueryPerformanceCounter(&counter);
     QueryPerformanceFrequency(&freq);
 
-    ret = (double)counter.QuadPart / (double)freq.QuadPart * 1000000.0;
+    ret = ((double)counter.QuadPart / (double)freq.QuadPart) * 1000000.0;
 
     return (uint32_t)ret;
   }
 
-#endif // 0
+
 
 }
 

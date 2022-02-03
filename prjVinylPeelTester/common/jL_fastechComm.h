@@ -111,7 +111,7 @@
 class jL_fastechComm : public jL_CommSerial
 {
 public:
-	typedef int (*CallbackDataUpdate)(void* obj, uint8_t* data, uint16_t length); // 콜백 타입 정의
+	typedef int (*CallbackDataUpdate)(void* obj, uint8_t* data, uint16_t length, uint8_t index); // 콜백 타입 정의
 	CallbackDataUpdate m_callbackUpdate;
 	void*  m_fastechMotorObject;
 private:
@@ -261,12 +261,21 @@ private:
 		bool			wait_next;
 		uint32_t  baud;
 		uint8_t   state;
-		uint32_t  pre_time;
+		uint32_t  resp_time;
 		uint16_t  packet_size;
 		uint32_t  index;
 		uint8_t   error;
 		fastech_packet_t  rx_packet;
 	} fastech_t;
+
+	struct check_sync {
+		uint32_t  sync_no{};
+		bool      is_checked{};
+		uint32_t  resp_time{};
+		uint32_t  avr_cnt{};
+		uint8_t   error{};
+		uint8_t		keep_id{};
+	};
 
 public:
 	enum class fastech_cmdList
@@ -305,6 +314,9 @@ public:
 		MOVE_ALL_ABS_POS,
 		MOVE_ALL_REL_POS,
 		GET_AXIS_STATUS,
+		GET_AXIS_IO_STATUS,
+		GET_MOTION_STATUS,
+		CLEAR_POSITION,
 		_max,
 	};
 
@@ -368,7 +380,9 @@ private:
 	_Cmd* m_CmdList;
 
 public:
-	bool m_IsWiatResponse;
+	
+	check_sync m_checkSync;
+	//bool m_IsWiatResponse;
 	bool	m_bThreadLife;
 	DWORD	m_ThreadId;
 	HANDLE m_hThread;
@@ -398,7 +412,8 @@ public:
 	void ReadyPort();
 	void UpdateReg();
 	int SetMotorId(uint8_t id);
-	int SendCmd(uint32_t cmd_index);
+	//int SendCmd(uint32_t cmd_index);
+	//jL_fastechComm::fastech_cmdList GetCommList(uint32_t index);
 	uint32_t SendCmd(fastech_cmdList cmdenum, uint8_t* data = nullptr, uint8_t length = 0);
 	DWORD ThreadRun();
 	int Terminate();

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+class tabMotor;
 
 // popDlg_axisStatus 대화 상자
 
@@ -8,6 +9,7 @@ class popDlg_axisStatus : public CDialogEx
 	DECLARE_DYNAMIC(popDlg_axisStatus)
 
 	UINT_PTR m_TimerID;
+	tabMotor* m_pParent;
 
 public:
 	popDlg_axisStatus(CWnd* pParent = nullptr);   // 표준 생성자입니다.

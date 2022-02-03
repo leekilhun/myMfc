@@ -53,13 +53,13 @@ public:
 
 	struct data_t
 	{
-		int				Order;
-		CString		Date;
-		int				ObjID;
-		level			Level;
-		CString		LogMsg;
-		CString		FileInfor;
-		int				LineNumber;
+		int				Order{};
+		CString		Date{};
+		int				ObjID{};
+		level			Level{};
+		CString		LogMsg{};
+		CString		FileInfor{};
+		int				LineNumber{};
 	};
 
 protected:

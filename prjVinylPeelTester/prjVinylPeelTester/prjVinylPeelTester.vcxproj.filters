@@ -99,6 +99,18 @@
     <ClInclude Include="popDlg_axisStatus.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\jL_Registor.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\def.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\LedButton.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\jL_scheduler.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="prjVinylPeelTester.cpp">
@@ -146,6 +158,9 @@
     <ClCompile Include="popDlg_axisStatus.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\jL_scheduler.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="prjVinylPeelTester.rc">
@@ -165,6 +180,12 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\bitmapTabMain.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\greenButton.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\redButton.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
