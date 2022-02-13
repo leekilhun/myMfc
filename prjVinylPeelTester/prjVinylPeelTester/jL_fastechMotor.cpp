@@ -16,6 +16,7 @@ jL_fastechMotor::jL_fastechMotor():
 
 jL_fastechMotor::~jL_fastechMotor()
 {
+	this->ISR_OnOff(false);
 	PortClose();
 
 	if (m_pComm != nullptr)

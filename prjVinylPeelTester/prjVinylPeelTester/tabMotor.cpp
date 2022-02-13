@@ -752,7 +752,7 @@ void tabMotor::OnBnClickedBtOrmcmdStart()
   m_orgMethod.GetLBText(m_orgMethod.GetCurSel(), data.GetBuffer(1024));
   data.ReleaseBuffer();
   int get_data = 0;
-  get_data = m_orgMethod.GetItemData(index);
+  get_data = (int)m_orgMethod.GetItemData(index);
   
   return;
 }

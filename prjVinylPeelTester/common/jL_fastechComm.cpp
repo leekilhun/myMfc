@@ -60,9 +60,9 @@
 #define DEF_FASTECH_COMM_TYPE_READ_IO_MAP             0x26
 #define DEF_FASTECH_COMM_TYPE_TRG_OUT_RUN_A           0x27
 #define DEF_FASTECH_COMM_TYPE_TRG_OUT_STATUS          0x28
-#define DEF_FASTECH_COMM_TYPE_SERVO_ENABLE            0x2A
-#define DEF_FASTECH_COMM_TYPE_ALARM_RESET             0x2B
-#define DEF_FASTECH_COMM_TYPE_GET_ALARM_INFO          0x2B
+#define DEF_FASTECH_COMM_TYPE_STEP_ENABLE             0x2A
+#define DEF_FASTECH_COMM_TYPE_ALARM_RESET             0x2C
+#define DEF_FASTECH_COMM_TYPE_GET_ALARM_INFO          0x2E
 #define DEF_FASTECH_COMM_TYPE_MOVE_STOP               0x31
 #define DEF_FASTECH_COMM_TYPE_MOVE_EMG_STOP           0x32
 #define DEF_FASTECH_COMM_TYPE_MOVE_ORG_SINGLE_AXIS    0x33
@@ -158,7 +158,7 @@ jL_fastechComm::jL_fastechComm():m_callbackUpdate(nullptr)
 	cmd.cmd = DEF_FASTECH_COMM_TYPE_TRG_OUT_STATUS;
 	cmd.name = L"TRG_OUT_STATUS";
 	m_CmdList->InsertCmd(cmd);
-	cmd.cmd = DEF_FASTECH_COMM_TYPE_SERVO_ENABLE;
+	cmd.cmd = DEF_FASTECH_COMM_TYPE_STEP_ENABLE;
 	cmd.name = L"SERVO_ENABLE";
 	m_CmdList->InsertCmd(cmd);
 	cmd.cmd = DEF_FASTECH_COMM_TYPE_ALARM_RESET;
