@@ -7,6 +7,7 @@
 #include "chatClient.h"
 #include "chatClientDlg.h"
 #include "afxdialogex.h"
+#include "Client.h"
 
 #include <string>
 #include <fstream>
@@ -29,7 +30,7 @@ CchatClientDlg::CchatClientDlg(CWnd* pParent /*=nullptr*/)
 	, m_sendMsg(_T(""))
 	, m_pClient(nullptr)
 	, m_nick(_T(""))
-	, m_imgType(_BMP)
+	, m_imgType(IMAGE_TYPE::_BMP)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,12 +62,12 @@ BEGIN_MESSAGE_MAP(CchatClientDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_CLEAR, &CchatClientDlg::OnBnClickedBtnClear)
 	ON_BN_CLICKED(IDC_BTN_DISCONNECT, &CchatClientDlg::OnBnClickedBtnDisconnect)
 	ON_BN_CLICKED(IDC_BTN_CONNECT, &CchatClientDlg::OnBnClickedBtnConnect)
-	ON_MESSAGE(UM_DISCONNECT_SERVER, &CClientSideDlg::OnDisconnectServer)
-	ON_MESSAGE(UM_RECV_TEXT, &CClientSideDlg::OnRecevieText)
-	ON_MESSAGE(UM_RECV_IMAGE, &CClientSideDlg::OnRecevieImage)
-	ON_MESSAGE(UM_RECV_FILE, &CClientSideDlg::OnRecevieFile)
-	ON_MESSAGE(UM_RECV_IMAGE_NAME, &CClientSideDlg::OnRecevieImageName)
-	ON_MESSAGE(UM_RECV_FILE_NAME, &CClientSideDlg::OnRecevieFileName)
+	ON_MESSAGE(UM_DISCONNECT_SERVER, &CchatClientDlg::OnDisconnectServer)
+	ON_MESSAGE(UM_RECV_TEXT, &CchatClientDlg::OnRecevieText)
+	ON_MESSAGE(UM_RECV_IMAGE, &CchatClientDlg::OnRecevieImage)
+	ON_MESSAGE(UM_RECV_FILE, &CchatClientDlg::OnRecevieFile)
+	ON_MESSAGE(UM_RECV_IMAGE_NAME, &CchatClientDlg::OnRecevieImageName)
+	ON_MESSAGE(UM_RECV_FILE_NAME, &CchatClientDlg::OnRecevieFileName)
 END_MESSAGE_MAP()
 
 
@@ -144,7 +145,7 @@ void CchatClientDlg::OnLbnDblclkListRecv()
 
 	switch (type)
 	{
-	case _IMAGE_NAME:
+	case DATA_TYPE::_IMAGE_NAME:
 	{
 		CString file_name, file_ext;
 		getFileNameAndExt(str, file_name, file_ext);
@@ -152,7 +153,7 @@ void CchatClientDlg::OnLbnDblclkListRecv()
 		dlg.DoModal();
 	}
 	break;
-	case _FILE_NAME:
+	case DATA_TYPE::_FILE_NAME:
 	{
 		CString file_name, file_ext;
 		getFileNameAndExt(str, file_name, file_ext);
@@ -182,11 +183,11 @@ void CchatClientDlg::OnBnClickedBtnFilesend()
 		CString file_ext = dlg.GetFileExt();
 		file_ext = file_ext.MakeUpper();
 
-		DATA_TYPE type = _UNKNOWN;
+		DATA_TYPE type = DATA_TYPE::_UNKNOWN;
 		if (file_ext == _T("BMP") || file_ext == _T("JPG") || file_ext == _T("PNG"))
-			type = _IMAGE;
+			type = DATA_TYPE::_IMAGE;
 		else
-			type = _FILE;
+			type = DATA_TYPE::_FILE;
 
 		m_pClient->sendFile(file_name.operator LPCWSTR(), file_path.operator LPCWSTR(), file_ext.operator LPCWSTR(), type);
 	}
@@ -273,7 +274,7 @@ void CchatClientDlg::closeClient()
 void CchatClientDlg::addListMsg(const CString& msg, const DATA_TYPE& type)
 {
 	int index = m_listRecv.AddString(msg);
-	m_listRecv.SetItemData(index, type);
+	m_listRecv.SetItemData(index, static_cast<DWORD_PTR>(type));
 	m_listRecv.SetTopIndex(m_listRecv.GetCount() - 1);
 }
 
@@ -281,7 +282,7 @@ void CchatClientDlg::getFileNameAndExt(const CString& str, CString& file_name, C
 {
 	// parsing file name
 	CString token;
-	token.Format(_T("[%s] "), m_nick);
+	token.Format(L"[%s] ", m_nick.GetBuffer());
 	CString msg(str);
 	msg.Replace(token, _T(""));
 	file_name = file_ext = msg;
@@ -300,7 +301,10 @@ LRESULT CchatClientDlg::OnDisconnectServer(WPARAM wp, LPARAM lp)
 
 LRESULT CchatClientDlg::OnRecevieText(WPARAM wp, LPARAM lp)
 {
-	wstring wstr = Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	wstring wstr;
+	
+	//= Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	trans::CharToLPTSTR((LPSTR)wp, (LPTSTR)wstr.c_str(), (int)wstr.capacity());
 	CString cstr(wstr.c_str());
 	addListMsg(cstr);
 	return LRESULT();
@@ -315,7 +319,8 @@ LRESULT CchatClientDlg::OnRecevieImage(WPARAM wp, LPARAM lp)
 	if (hg != nullptr)
 	{
 		LPVOID pBuf = ::GlobalLock(hg);
-		memcpy(pBuf, pImg, img_size);
+		if (pBuf)
+			memcpy(pBuf, pImg, img_size);
 		::GlobalUnlock(hg);
 
 		IStream* pStream = NULL;
@@ -331,16 +336,16 @@ LRESULT CchatClientDlg::OnRecevieImage(WPARAM wp, LPARAM lp)
 
 			switch (m_imgType)
 			{
-			case _BMP:
+			case IMAGE_TYPE::_BMP:
 				result = img.Save(m_fileName, Gdiplus::ImageFormatBMP);
 				break;
-			case _JPG:
+			case IMAGE_TYPE::_JPG:
 				result = img.Save(m_fileName, Gdiplus::ImageFormatJPEG);
 				break;
-			case _PNG:
+			case IMAGE_TYPE::_PNG:
 				result = img.Save(m_fileName, Gdiplus::ImageFormatPNG);
 				break;
-			case _GIF:
+			case IMAGE_TYPE::_GIF:
 				result = img.Save(m_fileName, Gdiplus::ImageFormatGIF);
 				break;
 			}
@@ -389,29 +394,31 @@ LRESULT CchatClientDlg::OnRecevieFile(WPARAM wp, LPARAM lp)
 
 LRESULT CchatClientDlg::OnRecevieImageName(WPARAM wp, LPARAM lp)
 {
-	wstring wstr = Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	wstring wstr;// = Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	trans::CharToLPTSTR((LPSTR)wp, (LPTSTR)wstr.c_str(), (int)wstr.capacity());
 	CString cstr(wstr.c_str());
-	addListMsg(cstr, _IMAGE_NAME);
+	addListMsg(cstr, DATA_TYPE::_IMAGE_NAME);
 
 	// get file name and ext from recv msg
 	getFileNameAndExt(cstr, m_fileName, m_fileExt);
 	// img type
 	if (m_fileExt == _T("BMP"))
-		m_imgType = _BMP;
+		m_imgType = IMAGE_TYPE::_BMP;
 	else if (m_fileExt == _T("JPG"))
-		m_imgType = _JPG;
+		m_imgType = IMAGE_TYPE::_JPG;
 	else if (m_fileExt == _T("PNG"))
-		m_imgType = _PNG;
+		m_imgType = IMAGE_TYPE::_PNG;
 	else if (m_fileExt == _T("GIF"))
-		m_imgType = _GIF;
+		m_imgType = IMAGE_TYPE::_GIF;
 	return LRESULT();
 }
 
 LRESULT CchatClientDlg::OnRecevieFileName(WPARAM wp, LPARAM lp)
 {
-	wstring wstr = Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	wstring wstr;// = Client::MultibyteToUnicode(CP_UTF8, (char*)wp, (int)lp);
+	trans::CharToLPTSTR((LPSTR)wp, (LPTSTR)wstr.c_str(), (int)wstr.capacity());
 	CString cstr(wstr.c_str());
-	addListMsg(cstr, _FILE_NAME);
+	addListMsg(cstr, DATA_TYPE::_FILE_NAME);
 
 	// get file name and ext from recv msg
 	getFileNameAndExt(cstr, m_fileName, m_fileExt);

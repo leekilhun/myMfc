@@ -13,7 +13,11 @@
 
 const int MAX_BUF = 4096;
 
-enum DATA_TYPE { _NICK, _TEXT, _IMAGE_NAME, _IMAGE, _FILE, _FILE_NAME, _UNKNOWN };
+//enum DATA_TYPE {  };
+
+enum class DATA_TYPE {
+    _NICK, _TEXT, _IMAGE_NAME, _IMAGE, _FILE, _FILE_NAME, _UNKNOWN
+};
 
 const unsigned int UM_CONNECT_CLIENT = WM_USER + 1;
 const unsigned int UM_DISCONNECT_CLIENT = WM_USER + 2;

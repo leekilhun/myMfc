@@ -10,18 +10,4 @@
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 
-#include "util.h"
-
-#define MAX_BUF                 4096
-#define UM_DISCONNECT_SERVER    WM_USER + 1
-#define UM_RECV_TEXT            WM_USER + 2
-#define UM_RECV_IMAGE           WM_USER + 3
-#define UM_RECV_FILE            WM_USER + 4
-#define UM_RECV_IMAGE_NAME      WM_USER + 5
-#define UM_RECV_FILE_NAME       WM_USER + 6
-
-
-enum class DATA_TYPE { _NICK, _TEXT, _IMAGE_NAME, _IMAGE, _FILE, _FILE_NAME, _UNKNOWN };
-enum class IMAGE_TYPE { _BMP, _JPG, _PNG, _GIF };
-
 #endif //PCH_H

@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "Client.h"
 
-#include <thread>
-
-#include <ws2tcpip.h>
+//#include <ws2tcpip.h>
 //#include <chrono>
-#include <atlimage.h>
+//#include <atlimage.h>
 #include <fstream>
-#include <climits>
+//#include <climits>
 
 
 
@@ -63,7 +61,7 @@ void Client::disconnectServer()
 	}
 }
 
-#if 0
+
 std::wstring Client::getMyip()
 {
 	char host[MAX_PATH] = {0,};
@@ -124,13 +122,13 @@ std::wstring Client::getMyip()
 			printf("AF_INET (IPv4)\n");
 			pIpv4 = (struct sockaddr_in*)ptr->ai_addr;
 			//inet_ntoa(pIpv4->sin_addr);
-			InetNtop(AF_INET, &pIpv4->sin_addr, ip_str, ip_size);
+			InetNtop(AF_INET, &pIpv4->sin_addr, ip_str, ip_size %46);
 			ip = ip_str;
 			break;
 		case AF_INET6:
 			// the InetNtop function is available on Windows Vista and later
 			pIpv6 = (struct sockaddr_in6*)ptr->ai_addr;
-			InetNtop(AF_INET6, &pIpv6->sin6_addr, ip_str, ip_size);
+			InetNtop(AF_INET6, &pIpv6->sin6_addr, ip_str, ip_size%46);
 			break;
 		case AF_NETBIOS:
 			break;
@@ -141,6 +139,8 @@ std::wstring Client::getMyip()
 
 	return ip;
 }
+
+
 
 bool Client::connectServer(wstring ip, int port)
 {
@@ -197,7 +197,7 @@ bool Client::sendSocket(const char* buf, const size_t& size)
 				if (total_size > INT_MAX)
 					send_size = INT_MAX;
 				else
-					send_size = total_size;
+					send_size = (int)total_size;
 
 				sent_size = send(client_sock, &buf[pos], send_size, 0);
 
@@ -224,14 +224,17 @@ bool Client::sendText(const std::wstring& msg, const DATA_TYPE& type)
 	wstring send_msg = L"[" + m_nick + L"] " + msg;
 
 	// utf-8 -> char
-	string str = Client::UnicodeToMultibyte(CP_UTF8, send_msg);
+	string str;
+	trans::TcharToLPSTR((LPTSTR)send_msg.c_str(), (LPSTR)str.c_str(), (int)str.capacity());
+	//str.assign(send_msg.begin(), send_msg.end());
+	//= Client::UnicodeToMultibyte(CP_UTF8, send_msg);
 
 	size_t txt_size = str.length();
 	size_t packet_size = 1 + sizeof(size_t) + txt_size;
 
 	char* buf = new char[packet_size];
 	memset(buf, 0, packet_size);
-	buf[0] = type;
+	buf[0] = static_cast<byte>(type);
 	memcpy(&buf[1], &txt_size, sizeof(size_t));
 	memcpy(&buf[1 + sizeof(size_t)], &str[0], txt_size);
 
@@ -245,18 +248,22 @@ bool Client::sendNick(const std::wstring& msg, const DATA_TYPE& type)
 {
 	m_nick = msg;
 	// utf-8 -> char
-	string str = Client::UnicodeToMultibyte(CP_UTF8, msg);
+	string str;
+	trans::TcharToLPSTR((LPTSTR)msg.c_str(), (LPSTR)str.c_str(), (int)str.capacity());
+	//str.assign(msg.begin(), msg.end());
+	//Client::UnicodeToMultibyte(CP_UTF8, msg);
 
 	size_t txt_size = str.length();
 	size_t packet_size = 1 + sizeof(size_t) + txt_size;
 
 	char* buf = new char[packet_size];
 	memset(buf, 0, packet_size);
-	buf[0] = type;
+	buf[0] = static_cast<byte>(type);
 	memcpy(&buf[1], &txt_size, sizeof(size_t));
 	memcpy(&buf[1 + sizeof(size_t)], &str[0], txt_size);
 
 	bool result = sendSocket(buf, packet_size);
+	delete[] buf;
 	return result;
 }
 
@@ -279,6 +286,35 @@ bool Client::sendFile(const std::wstring& file_name, const std::wstring& file_pa
 
 	return true;
 }
+
+
+void Client::recvFinished(const DATA_TYPE& type, const char* buf, const size_t& recv_size, const size_t& data_size)
+{
+	if (m_pParent)
+	{
+		switch (type)
+		{
+		case DATA_TYPE::_NICK:
+			break;
+		case DATA_TYPE::_TEXT:
+			m_pParent->SendMessage(UM_RECV_TEXT, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
+			break;
+		case DATA_TYPE::_IMAGE_NAME:
+			m_pParent->SendMessage(UM_RECV_IMAGE_NAME, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
+			break;
+		case DATA_TYPE::_IMAGE:
+			m_pParent->SendMessage(UM_RECV_IMAGE, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
+			break;
+		case DATA_TYPE::_FILE:
+			m_pParent->SendMessage(UM_RECV_FILE, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
+			break;
+		case DATA_TYPE::_FILE_NAME:
+			m_pParent->SendMessage(UM_RECV_FILE_NAME, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
+			break;
+		}
+	}
+}
+
 
 char* Client::ImageToBytes(const std::wstring& file_path, const std::wstring& file_ext, size_t& size)
 {
@@ -304,16 +340,17 @@ char* Client::ImageToBytes(const std::wstring& file_path, const std::wstring& fi
 			img.Save(pStream, Gdiplus::ImageFormatPNG);
 
 		HGLOBAL hg = nullptr;
-		::GetHGlobalFromStream(pStream, &hg);
+		HRESULT ret = ::GetHGlobalFromStream(pStream, &hg);
 		char* pBuf = static_cast<char*>(::GlobalLock(hg));
-
-		size_t img_size = ::GlobalSize(pBuf);
+		size_t img_size = 0;
+		if (pBuf)
+			img_size = ::GlobalSize(pBuf);
 		size_t packet_size = img_size + 1 + sizeof(size_t);
 		size = packet_size;
 
 		char* pImg = new char[packet_size];
 		memset(pImg, 0, packet_size);
-		pImg[0] = _IMAGE;
+		pImg[0] = static_cast<byte>(DATA_TYPE::_IMAGE);
 		memcpy(&pImg[1], &img_size, sizeof(size_t));
 		memcpy(&pImg[1 + sizeof(size_t)], pBuf, img_size);
 
@@ -393,7 +430,7 @@ char* Client::FileToBytes(const std::wstring& file_path, const std::wstring& fil
 		char* pBuf = new char[packet_size];
 		memset(pBuf, 0, size);
 
-		pBuf[0] = _FILE;
+		pBuf[0] = static_cast<byte>(DATA_TYPE::_FILE);
 		memcpy(&pBuf[1], &file_size, sizeof(size_t));
 
 		file.read(&pBuf[1 + sizeof(size_t)], size);
@@ -405,6 +442,10 @@ char* Client::FileToBytes(const std::wstring& file_path, const std::wstring& fil
 
 	return nullptr;
 }
+
+
+
+#if 0
 
 const string Client::UnicodeToMultibyte(const unsigned int& code_page, const std::wstring& strWide)
 {
@@ -429,32 +470,8 @@ const std::wstring Client::MultibyteToUnicode(const unsigned int& code_page, con
 	return str.c_str();
 }
 
-void Client::recvFinished(const DATA_TYPE& type, const char* buf, const size_t& recv_size, const size_t& data_size)
-{
-	if (m_pParent)
-	{
-		switch (type)
-		{
-		case _NICK:
-			break;
-		case _TEXT:
-			m_pParent->SendMessage(UM_RECV_TEXT, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
-			break;
-		case _IMAGE_NAME:
-			m_pParent->SendMessage(UM_RECV_IMAGE_NAME, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
-			break;
-		case _IMAGE:
-			m_pParent->SendMessage(UM_RECV_IMAGE, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
-			break;
-		case _FILE:
-			m_pParent->SendMessage(UM_RECV_FILE, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
-			break;
-		case _FILE_NAME:
-			m_pParent->SendMessage(UM_RECV_FILE_NAME, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
-			break;
-		}
-	}
-}
+
+#endif
 
 unsigned int threadSend(LPVOID p, SOCKET& sock, const DATA_TYPE& type, const wstring& name, const wstring& path, const wstring& ext)
 {
@@ -466,13 +483,13 @@ unsigned int threadSend(LPVOID p, SOCKET& sock, const DATA_TYPE& type, const wst
 	{
 		switch (type)
 		{
-		case _NICK:
+		case DATA_TYPE::_NICK:
 			break;
-		case _TEXT:
+		case DATA_TYPE::_TEXT:
 			break;
-		case _IMAGE:
+		case DATA_TYPE::_IMAGE:
 		{
-			pC->sendText(name, _IMAGE_NAME);
+			pC->sendText(name, DATA_TYPE::_IMAGE_NAME);
 			std::this_thread::sleep_for(100ms);
 			size_t packet_size = 0;
 			char* pImg = pC->ImageToBytes(path, ext, packet_size);
@@ -480,9 +497,9 @@ unsigned int threadSend(LPVOID p, SOCKET& sock, const DATA_TYPE& type, const wst
 			delete[] pImg;
 		}
 		break;
-		case _FILE:
+		case DATA_TYPE::_FILE:
 		{
-			pC->sendText(name, _FILE_NAME);
+			pC->sendText(name, DATA_TYPE::_FILE_NAME);
 			std::this_thread::sleep_for(100ms);
 			size_t packet_size = 0;
 			char* pFile = pC->FileToBytes(path, ext, packet_size);
@@ -513,7 +530,7 @@ unsigned int threadRecv(LPVOID p, SOCKET& sock)
 		int recv_size = 0;
 		size_t data_size = 0;
 		size_t pos = 0;
-		DATA_TYPE type = _UNKNOWN;
+		DATA_TYPE type = DATA_TYPE::_UNKNOWN;
 		bool bDisconnect = false;
 
 		do
@@ -528,7 +545,7 @@ unsigned int threadRecv(LPVOID p, SOCKET& sock)
 			else
 			{
 				total_size += recv_size;
-				if (type == _UNKNOWN && recv_size > 1 + sizeof(size_t))
+				if (type == DATA_TYPE::_UNKNOWN && recv_size > 1 + sizeof(size_t))
 				{
 					type = static_cast<DATA_TYPE>(buf[0]);
 					memcpy(&data_size, &buf[1], sizeof(size_t));
@@ -540,9 +557,11 @@ unsigned int threadRecv(LPVOID p, SOCKET& sock)
 						memset(pRecvBuf, 0, packet_size);
 					}
 				}
-				memcpy(&pRecvBuf[pos], buf, recv_size);
-				pos += recv_size;
-
+                if (pRecvBuf) {
+                    if (&pRecvBuf[pos])
+                        memcpy(&pRecvBuf[pos], buf, recv_size);
+                    pos += recv_size;
+                }
 			}
 		} while (total_size < data_size + 1 + sizeof(size_t));
 
@@ -572,5 +591,3 @@ unsigned int threadRecv(LPVOID p, SOCKET& sock)
 	sock = INVALID_SOCKET;
 	return 0;
 }
-
-#endif

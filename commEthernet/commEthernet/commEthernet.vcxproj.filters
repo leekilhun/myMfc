@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="chatClient.h">
+    <ClInclude Include="commEthernet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="chatClientDlg.h">
+    <ClInclude Include="commEthernetDlg.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
@@ -33,10 +33,7 @@
     <ClInclude Include="pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ImageDlg.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Client.h">
+    <ClInclude Include="jL_ethernet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="util.h">
@@ -44,34 +41,31 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="chatClient.cpp">
+    <ClCompile Include="commEthernet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="chatClientDlg.cpp">
+    <ClCompile Include="commEthernetDlg.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ImageDlg.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Client.cpp">
+    <ClCompile Include="jL_ethernet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="chatClient.rc">
+    <ResourceCompile Include="commEthernet.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\chatClient.rc2">
+    <None Include="res\commEthernet.rc2">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\chatClient.ico">
+    <Image Include="res\commEthernet.ico">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

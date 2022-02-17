@@ -165,7 +165,7 @@ void CchatServerDlg::OnBnClickedBtnSend()
 		UpdateData(true);
 		if (m_sendMsg.GetLength() > 0)
 		{
-			m_pServer->sendText(m_sendMsg.operator LPCWSTR(), _TEXT);
+			m_pServer->sendText(m_sendMsg.operator LPCWSTR(), DATA_TYPE::_TEXT);
 			m_sendMsg = _T("");
 			UpdateData(false);
 		}
@@ -228,13 +228,13 @@ void CchatServerDlg::addListText(const CString& msg)
 LRESULT CchatServerDlg::OnConnectClient(WPARAM wp, LPARAM lp)
 {
 	wchar_t buf[46];
-	DWORD buf_size = sizeof(buf);
+	size_t buf_size = sizeof(buf);
 	memset(&buf, 0, buf_size);
-	InetNtop(AF_INET, &wp, buf, buf_size);
+	InetNtop(AF_INET, &wp, buf, buf_size%92);
 
 	CString ip = buf;
 	CString port;
-	port.Format(_T("%d"), lp);
+	port.Format(_T("%d"), (int)lp);
 
 	addListClient(ip, port);
 	return 0;
@@ -243,13 +243,13 @@ LRESULT CchatServerDlg::OnConnectClient(WPARAM wp, LPARAM lp)
 LRESULT CchatServerDlg::OnDisconnectClient(WPARAM wp, LPARAM lp)
 {
 	wchar_t buf[46];
-	DWORD buf_size = sizeof(buf);
+	size_t buf_size = sizeof(buf);
 	memset(&buf, 0, buf_size);
-	InetNtop(AF_INET, &wp, buf, buf_size);
+	InetNtop(AF_INET, &wp, buf, buf_size%92);
 
 	CString ip = buf;
 	CString port;
-	port.Format(_T("%d"), lp);
+	port.Format(_T("%d"), (int)lp);
 
 	// delete list control (ip and port)
 	for (int row = 0; row < m_list.GetItemCount(); row++)

@@ -27,7 +27,7 @@ public:
 	bool removeClient(const SOCKET& sock, const SOCKADDR_IN& addr);
 	void setAddrFromSocket(const SOCKADDR_IN& addr, UINT_PTR& wp, LONG_PTR& lp);
 
-	void sendText(std::wstring msg, const DATA_TYPE& type = _TEXT);
+	void sendText(std::wstring msg, const DATA_TYPE& type = DATA_TYPE::_TEXT);
 	void recvFinished(const DATA_TYPE& type, const char* buf, const size_t& recv_size, const size_t& data_size, const char* nick, const size_t& nick_size);
 
 	static const std::string UnicodeToMultibyte(const unsigned int& code_page, const std::wstring& strWide);

@@ -9,10 +9,20 @@ class Client;
 // CchatClientDlg 대화 상자
 class CchatClientDlg : public CDialogEx
 {
+	CIPAddressCtrl m_ip;
+	int m_port;
+	CString m_nick;
+	CListBox m_listRecv;
+	CString m_sendMsg;
+	Client* m_pClient;
+	CString m_fileName, m_fileExt;
+	IMAGE_TYPE m_imgType;
+
+
 // 생성입니다.
 public:
 	CchatClientDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
-
+	~CchatClientDlg();
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_CHATCLIENT_DIALOG };
@@ -43,7 +53,7 @@ public:
 
 private:
 	void closeClient();
-	void addListMsg(const CString& msg, const DATA_TYPE& type = _TEXT);
+	void addListMsg(const CString& msg, const DATA_TYPE& type = DATA_TYPE::_TEXT);
 	void getFileNameAndExt(const CString& str, CString& file_name, CString& file_ext);
 
 	LRESULT OnDisconnectServer(WPARAM wp, LPARAM lp);
@@ -56,13 +66,6 @@ private:
 
 
 private:
-	CIPAddressCtrl m_ip;
-	int m_port;
-	CString m_nick;
-	CListBox m_listRecv;
-	CString m_sendMsg;
-	Client* m_pClient;
-	CString m_fileName, m_fileExt;
-	IMAGE_TYPE m_imgType;
+
 	
 };

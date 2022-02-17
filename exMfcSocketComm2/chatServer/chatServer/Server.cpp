@@ -5,6 +5,12 @@
 #include <chrono>
 #include <ws2tcpip.h>
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+
+
 using namespace std;
 
 unsigned int listenThread(LPVOID p, const SOCKET& sock);
@@ -153,13 +159,13 @@ wstring Server::getMyip()
 			printf("AF_INET (IPv4)\n");
 			pIpv4 = (struct sockaddr_in*)ptr->ai_addr;
 			//inet_ntoa(pIpv4->sin_addr);
-			InetNtop(AF_INET, &pIpv4->sin_addr, ip_str, ip_size);
+            InetNtop(AF_INET, &pIpv4->sin_addr, ip_str, ip_size % 92);
 			ip = ip_str;
 			break;
 		case AF_INET6:
 			// the InetNtop function is available on Windows Vista and later
 			pIpv6 = (struct sockaddr_in6*)ptr->ai_addr;
-			InetNtop(AF_INET6, &pIpv6->sin6_addr, ip_str, ip_size);
+			InetNtop(AF_INET6, &pIpv6->sin6_addr, ip_str, ip_size % 92);
 			break;
 		case AF_NETBIOS:
 			break;
@@ -257,7 +263,7 @@ void Server::sendText(std::wstring msg, const DATA_TYPE& type)
 
 	char* buf = new char[packet_size];
 	memset(buf, 0, packet_size);
-	buf[0] = type;
+	buf[0] = static_cast<char>(type);
 	memcpy(&buf[1], &txt_size, sizeof(size_t));
 	memcpy(&buf[1 + sizeof(size_t)], &str[0], txt_size);
 
@@ -272,19 +278,19 @@ void Server::recvFinished(const DATA_TYPE& type, const char* buf, const size_t& 
 	{
 		switch (type)
 		{
-		case _NICK:
+		case DATA_TYPE::_NICK:
 			m_pParent->SendMessage(UM_RECV_NICK, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
 			break;
-		case _TEXT:
+		case DATA_TYPE::_TEXT:
 			broadcast(buf, recv_size);
 			m_pParent->SendMessage(UM_RECV_TEXT, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
 			break;
-		case _IMAGE:
-		case _FILE:
+		case DATA_TYPE::_IMAGE:
+		case DATA_TYPE::_FILE:
 			broadcast(buf, recv_size);
 			break;
-		case _IMAGE_NAME:
-		case _FILE_NAME:
+		case DATA_TYPE::_IMAGE_NAME:
+		case DATA_TYPE::_FILE_NAME:
 			broadcast(buf, recv_size);
 			m_pParent->SendMessage(UM_RECV_TEXT, (WPARAM)&buf[1 + sizeof(size_t)], data_size);
 			break;
@@ -296,11 +302,11 @@ void Server::broadcastNick(const char* buf, const size_t& size)
 {
 	size_t data_size = 2 + size; // '[' ']'
 	size_t packet_size = 1 + sizeof(size_t) + data_size;
-	char* buf2 = new char[packet_size];
-	memset(buf2, 0, data_size);
-	buf2[0] = _TEXT;
+	char* buf2 = new char[packet_size] {0,};
+	buf2[0] = static_cast<char>(DATA_TYPE::_TEXT);
 	memcpy(&buf2[1], &data_size, sizeof(size_t));
-	buf2[1 + sizeof(size_t)] = '[';
+
+	buf2[9/*(1 + sizeof(size_t))*/% (packet_size*1)] = (char)'[';
 	memcpy(&buf2[1 + sizeof(size_t) + 1], buf, size);
 	buf2[packet_size - 1] = ']';
 
@@ -310,9 +316,11 @@ void Server::broadcastNick(const char* buf, const size_t& size)
 		size_t send_size = 0;
 		do
 		{
-			send_size = send(*itr, &buf2[send_size], packet_size - send_size, 0);
+			send_size = (size_t)send(*itr, &buf2[send_size],(int) (packet_size - send_size), 0);
 		} while (send_size < packet_size);
 	}
+
+	delete[] buf2;
 }
 
 void Server::broadcast(const char* buf, const size_t& size)
@@ -339,7 +347,7 @@ void Server::broadcast(const char* buf, const size_t& size)
 				if (total_size > INT_MAX)
 					send_size = INT_MAX;
 				else
-					send_size = total_size;
+					send_size = (int)total_size;
 
 				sent_size = send(*itr, &buf[pos], send_size, 0);
 
@@ -397,7 +405,7 @@ unsigned int clientThread(LPVOID p, SOCKET sock, SOCKADDR_IN addr)
 		int recv_size = 0;
 		size_t data_size = 0;
 		size_t pos = 0;
-		DATA_TYPE type = _UNKNOWN;
+		DATA_TYPE type = DATA_TYPE::_UNKNOWN;
 		bool bDisconnect = false;
 
 		do
@@ -412,7 +420,7 @@ unsigned int clientThread(LPVOID p, SOCKET sock, SOCKADDR_IN addr)
 			else
 			{
 				total_size += recv_size;
-				if (type == _UNKNOWN && recv_size >= 1 + sizeof(size_t))
+				if (type == DATA_TYPE::_UNKNOWN && recv_size >= 1 + sizeof(size_t))
 				{
 					type = static_cast<DATA_TYPE>(buf[0]);
 					memcpy(&data_size, &buf[1], sizeof(size_t));
@@ -424,8 +432,11 @@ unsigned int clientThread(LPVOID p, SOCKET sock, SOCKADDR_IN addr)
 						memset(pRecvBuf, 0, packet_size);
 					}
 				}
-				memcpy(&pRecvBuf[pos], buf, recv_size);
-				pos += recv_size;
+                if (pRecvBuf) {
+					if (&pRecvBuf[pos])
+						memcpy(&pRecvBuf[pos], buf, recv_size);
+                    pos += recv_size;
+                }
 			}
 
 		} while (total_size < data_size + 1 + sizeof(size_t));
@@ -439,7 +450,7 @@ unsigned int clientThread(LPVOID p, SOCKET sock, SOCKADDR_IN addr)
 
 		if (total_size == data_size + 1 + sizeof(size_t))
 		{
-			if (nick_size == 0 && type == _NICK)
+			if (nick_size == 0 && type == DATA_TYPE::_NICK)
 			{
 				memcpy(nick, &buf[1 + sizeof(size_t)], data_size);
 				nick_size = data_size;
